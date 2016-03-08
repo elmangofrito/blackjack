@@ -44,9 +44,9 @@ public class client implements Runnable {
                 addserver(modifiedSentence);
                 clientSocket.close();
             } catch (SocketException ex) {
-                Logger.getLogger(cliente.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-                Logger.getLogger(cliente.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     //}
