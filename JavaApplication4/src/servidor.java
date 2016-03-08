@@ -34,7 +34,7 @@ public class servidor extends Thread {
             while (true) {
                
 //se prepara el mensaje 
-                String message = "Servidor-Ap";
+                String message = "Servidor-Ap1";
                 msg = message.getBytes();
                 
 //se crea el datagrama que contendrá al mensaje
