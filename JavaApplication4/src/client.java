@@ -1,5 +1,4 @@
 
-import java.awt.List;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -36,11 +35,12 @@ public class client implements Runnable {
                 ul=new JComboBox();
                 
   //      while (true) {
-            
+            Json x=new Json();
             try {
                 DatagramSocket clientSocket = new DatagramSocket(8050);
                 clientSocket.receive(receivePacket);
                 String modifiedSentence = new String(receivePacket.getData());
+                System.out.println("xxx-Z>" + x.deco_1(modifiedSentence, 0));                
                 addserver(modifiedSentence);
                 clientSocket.close();
             } catch (SocketException ex) {
@@ -62,7 +62,7 @@ public class client implements Runnable {
         }
         if (!in) {
             ul.addItem(msg);
-            System.out.println("agregado "+ul.getItemAt(0));
+            System.out.println("agregado "+msg);
         }
         
         
