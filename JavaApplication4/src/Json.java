@@ -26,7 +26,10 @@ public class Json {
         paquete.addProperty("TIEMPO", tiempo.toString());
         paquete.addProperty("ESPACIOS", espacios.toString());
         cadena_JSON = paquete.toString();
-      
+        paquete.remove("COD");
+        paquete.remove("NOMBRE");
+        paquete.remove("TIEMPO");
+        paquete.remove("ESPACIOS");
         
         return cadena_JSON;
     }
