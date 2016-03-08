@@ -22,6 +22,7 @@ import javax.swing.JComboBox;
  */
 public class client implements Runnable {
 
+    Json paquete;
     public client() {
         run();
     }

@@ -20,28 +20,28 @@ import java.util.logging.Logger;
  */
 public class servidor extends Thread {
 
+    Json paquete;
+
     @Override
     public void run() {
         try {
             int PUERTO = 8050;
-            
+
             byte msg[] = new byte[1024];
-            
+
 //Creamos el socket UDP del servidor en el pueto asociado
             DatagramSocket s = new DatagramSocket();
             System.out.println("Servidor Activo");
-            InetAddress ip=InetAddress.getByName("localhost");
+            InetAddress ip = InetAddress.getByName("localhost");
+            paquete=new Json();
+            String message = paquete.code_1("server-javkell", "50", "4");
+                
             while (true) {
-               
-//se prepara el mensaje 
-                String message = "Servidor-Ap1";
-                msg = message.getBytes();
-                
-//se crea el datagrama que contendrá al mensaje
-                DatagramPacket paquete = new DatagramPacket(msg, msg.length,ip ,8050);
-                
-//se le envia al cliente
-                System.out.println("mensaje a enviar" + msg);
+            msg = message.getBytes();
+
+                DatagramPacket paquete = new DatagramPacket(msg, msg.length, ip, 8050);
+
+                System.out.println("mensaje a enviar" + message);
                 s.send(paquete);
                 System.out.println("mensaje enviado");
             }
