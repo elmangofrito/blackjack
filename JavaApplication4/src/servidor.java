@@ -34,10 +34,11 @@ public class servidor extends Thread {
             System.out.println("Servidor Activo");
             InetAddress ip = InetAddress.getByName("localhost");
             paquete=new Json();
-            String message = paquete.code_1("server-javkell", "50", "4");
+            
                 
             while (true) {
-            msg = message.getBytes();
+                String message = paquete.code_1("server-javkell", "50", "4");
+                msg = message.getBytes();
 
                 DatagramPacket paquete = new DatagramPacket(msg, msg.length, ip, 8050);
 
