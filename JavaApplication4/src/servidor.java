@@ -37,11 +37,9 @@ public class servidor extends Thread {
             
                 
             while (true) {
-                String message = paquete.code_1("server-javkell", "50", "4");
+                String message = paquete.code_1("server-javkell","50","4");
                 msg = message.getBytes();
-
                 DatagramPacket paquete = new DatagramPacket(msg, msg.length, ip, 8050);
-
                 System.out.println("mensaje a enviar" + message);
                 s.send(paquete);
                 System.out.println("mensaje enviado");
