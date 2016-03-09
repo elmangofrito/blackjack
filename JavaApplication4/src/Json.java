@@ -25,7 +25,7 @@ public class Json {
     public int getCode(String recv) {
         JsonParser parser = new JsonParser();
         com.google.gson.JsonElement Objeto = parser.parse(recv);
-   
+
         return Objeto.getAsJsonObject().get("COD").getAsInt();
     }
 
@@ -39,8 +39,8 @@ public class Json {
         paquete.remove("NOMBRE");
         paquete.remove("TIEMPO");
         paquete.remove("ESPACIOS");
-       return cadena_JSON;
-    
+        return cadena_JSON;
+
     }
 
     public Object deco_1(String JSON, int opcion) {
@@ -116,14 +116,21 @@ public class Json {
         return null;
     }
 
-    public String code_4(Object acpt, Object dir, Object id) {
+    public String code_4(Object jugador1, Object idjugador1, Object jugador2, Object idjugador2, Object jugador3, Object idjugador3, Object jugador4, Object idjugador4) {
         paquete.addProperty("COD", "4");
-        paquete.addProperty("ACEPTADO", acpt.toString());
-        paquete.addProperty("DIRECCION", dir.toString());
-        paquete.addProperty("ID", id.toString());
+        paquete.addProperty("JUGADOR1", jugador1.toString());
+        paquete.addProperty("IDJUGADOR1", idjugador1.toString());
+        paquete.addProperty("JUGADOR2", jugador2.toString());
+        paquete.addProperty("IDJUGADOR2", idjugador2.toString());
+        paquete.addProperty("JUGADOR3", jugador3.toString());
+        paquete.addProperty("IDJUGADOR3", idjugador3.toString());
+        paquete.addProperty("JUGADOR4", jugador4.toString());
+        paquete.addProperty("IDJUGADOR4", idjugador4.toString());
+
         cadena_JSON = paquete.toString();
         return cadena_JSON;
     }
+
     public Object deco_4(String JSON, int opcion) {
         JsonParser parser = new JsonParser();
         JsonElement Objeto = parser.parse(JSON);
@@ -132,26 +139,49 @@ public class Json {
             return Objeto.getAsJsonObject().get("COD").getAsInt();
         }
         if (opcion == 1) {
-            return Objeto.getAsJsonObject().get("ACEPTADO").getAsString();
+            return Objeto.getAsJsonObject().get("JUGADOR1").getAsString();
         }
         if (opcion == 2) {
-            return Objeto.getAsJsonObject().get("DIRECCION").getAsString();
+            return Objeto.getAsJsonObject().get("IDJUGADOR1").getAsString();
         }
         if (opcion == 3) {
-            return Objeto.getAsJsonObject().get("ID").getAsString();
+            return Objeto.getAsJsonObject().get("JUGADOR2").getAsString();
+        }
+        if (opcion == 4) {
+            return Objeto.getAsJsonObject().get("IDJUGADOR2").getAsString();
+        }
+        if (opcion == 5) {
+            return Objeto.getAsJsonObject().get("JUGADOR3").getAsString();
+        }
+        if (opcion == 6) {
+            return Objeto.getAsJsonObject().get("IDJUGADOR3").getAsString();
+        }
+        if (opcion == 7) {
+            return Objeto.getAsJsonObject().get("JUGADOR4").getAsString();
+        }
+        if (opcion == 8) {
+            return Objeto.getAsJsonObject().get("IDJUGADOR4").getAsString();
         } else {
             System.err.println("error");
         }
         return null;
     }
-    public String code_5(Object acpt, Object dir, Object id) {
+
+    public String code_5(Object jugador1, Object idjugador1, Object jugador2, Object idjugador2, Object jugador3, Object idjugador3, Object jugador4, Object idjugador4) {
         paquete.addProperty("COD", "4");
-        paquete.addProperty("ACEPTADO", acpt.toString());
-        paquete.addProperty("DIRECCION", dir.toString());
-        paquete.addProperty("ID", id.toString());
+        paquete.addProperty("PUNTAJE1", jugador1.toString());
+        paquete.addProperty("IDJUGADOR1", idjugador1.toString());
+        paquete.addProperty("PUNTAJE2", jugador2.toString());
+        paquete.addProperty("IDJUGADOR2", idjugador2.toString());
+        paquete.addProperty("PUNTAJE3", jugador3.toString());
+        paquete.addProperty("IDJUGADOR3", idjugador3.toString());
+        paquete.addProperty("PUNTAJE4", jugador4.toString());
+        paquete.addProperty("IDJUGADOR4", idjugador4.toString());
+
         cadena_JSON = paquete.toString();
         return cadena_JSON;
     }
+
     public Object deco_5(String JSON, int opcion) {
         JsonParser parser = new JsonParser();
         JsonElement Objeto = parser.parse(JSON);
@@ -160,18 +190,32 @@ public class Json {
             return Objeto.getAsJsonObject().get("COD").getAsInt();
         }
         if (opcion == 1) {
-            return Objeto.getAsJsonObject().get("ACEPTADO").getAsString();
+            return Objeto.getAsJsonObject().get("PUNTAJE1").getAsString();
         }
         if (opcion == 2) {
-            return Objeto.getAsJsonObject().get("DIRECCION").getAsString();
+            return Objeto.getAsJsonObject().get("IDJUGADOR1").getAsString();
         }
         if (opcion == 3) {
-            return Objeto.getAsJsonObject().get("ID").getAsString();
+            return Objeto.getAsJsonObject().get("PUNTAJE2").getAsString();
+        }
+        if (opcion == 4) {
+            return Objeto.getAsJsonObject().get("IDJUGADOR2").getAsString();
+        }
+        if (opcion == 5) {
+            return Objeto.getAsJsonObject().get("PUNTAJE3").getAsString();
+        }
+        if (opcion == 6) {
+            return Objeto.getAsJsonObject().get("IDJUGADOR3").getAsString();
+        }
+        if (opcion == 7) {
+            return Objeto.getAsJsonObject().get("PUNTAJE4").getAsString();
+        }
+        if (opcion == 8) {
+            return Objeto.getAsJsonObject().get("IDJUGADOR4").getAsString();
         } else {
             System.err.println("error");
         }
         return null;
     }
-    
 
 }
