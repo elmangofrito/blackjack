@@ -119,7 +119,8 @@ public class servidor extends JFrame implements Runnable {
                 in.read(b);
                 clientSentence = new String(b);
 
-                System.out.println("Received: " + clientSentence);
+                
+                System.out.println("recibido: " + clientSentence);
                 capitalizedSentence = clientSentence.toUpperCase() + '\n';
                 outToClient.writeBytes(capitalizedSentence);
             } catch (IOException ex) {
