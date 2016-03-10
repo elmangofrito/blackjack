@@ -1,5 +1,6 @@
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -43,9 +44,9 @@ public class servidor extends JFrame implements Runnable {
                 String message = paquete.code_1("server-javkell", "50", "4");
                 msg = message.getBytes();
                 DatagramPacket paquete = new DatagramPacket(msg, msg.length, ip, PUERTO);
-                System.out.println("mensaje a enviar" + message);
+             //   System.out.println("mensaje a enviar" + message);
                 s.send(paquete);
-                System.out.println("mensaje enviado");
+               // System.out.println("mensaje enviado");
             }
         } catch (SocketException ex) {
             Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
@@ -56,17 +57,23 @@ public class servidor extends JFrame implements Runnable {
     }
 
     public servidor() {
-        Thread hilo = new Thread(this);
-        hilo.start();
-
+        Thread hiloUDP = new Thread(this);
+        hiloUDP.start();
+        hilotcp servertcp=new hilotcp();
+        Thread hiloTCP=new Thread(servertcp);
+        hiloTCP.start();
+        
     }
 
-    public class hilotcp extends Thread {
+    public class hilotcp implements Runnable{
 
         String clientSentence;
         String capitalizedSentence;
         ServerSocket welcomeSocket;
-
+        public void hilotcp(){
+            
+         
+        }
         @Override
         public void run() {
             try {
@@ -74,7 +81,11 @@ public class servidor extends JFrame implements Runnable {
                 Socket connectionSocket = welcomeSocket.accept();
                 BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
                 DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
-                clientSentence = inFromClient.readLine();
+                DataInputStream in=new DataInputStream(connectionSocket.getInputStream());
+                byte[] b=new byte[1024];
+                in.read(b);
+                clientSentence=new String(b).trim();
+                
                 System.out.println("Received: " + clientSentence);
                 capitalizedSentence = clientSentence.toUpperCase() + '\n';
                 outToClient.writeBytes(capitalizedSentence);

@@ -88,7 +88,7 @@ public class client extends JFrame implements Runnable {
                 receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 clientSocket.receive(receivePacket);
                 modifiedSentence = new String(receivePacket.getData()).trim();
-                host=receivePacket.getAddress().toString().trim().replace("\\", "");
+                host=receivePacket.getAddress().toString().trim().replace("/", "");
                
                 if (modifiedSentence != null) {
                     addserver(x.deco_1(modifiedSentence, 1).toString());
@@ -139,7 +139,7 @@ public class client extends JFrame implements Runnable {
                 String msgs = "CLIENTE-ANGESUS";
 
                 in = new DataInputStream(cliente.getInputStream());
-
+                out.writeBytes(msgs);
                 address = InetAddress.getLocalHost();
             } catch (IOException ex) {
                 Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
