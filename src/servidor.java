@@ -59,9 +59,6 @@ public class servidor extends JFrame implements Runnable {
     public servidor() {
         Thread hiloUDP = new Thread(this);
         hiloUDP.start();
-       // hilotcp servertcp = new hilotcp();
-      //  Thread hiloTCP = new Thread(servertcp);
-      //  hiloTCP.start();
         HiloControl controlsocket=new HiloControl();
         Thread hiloTCP = new Thread(controlsocket);
         hiloTCP.start();
