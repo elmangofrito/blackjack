@@ -12,14 +12,15 @@ import javax.swing.JComboBox;
  * @author javier
  */
 public class Inicio extends javax.swing.JFrame {
-
     /**
      * Creates new form NewJFrame
      */
+    
     public Inicio() {
+       
         initComponents();
     }
-    public javax.swing.JComboBox jComboBox1;
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -112,19 +113,16 @@ public class Inicio extends javax.swing.JFrame {
         jButton1.setVisible(false);
         jButton2.setVisible(false);
         jLabel1.setVisible(false);
-        client obj=new client();
-        obj.ul.setLocation(30, 50);
-        add(obj.ul);
-        System.out.println(obj.ul.getItemAt(0));
-        obj.ul.setVisible(true);
-       
+        this.setVisible(false);
+        new client();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         jButton1.setVisible(false);
         jButton2.setVisible(false);
         jLabel1.setVisible(false);
-        servidor obj = new servidor();
+        servidor serv=new servidor();
+                
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
@@ -154,7 +152,7 @@ public class Inicio extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-        
+          
                 /* Createand display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
