@@ -44,9 +44,9 @@ public class servidor extends JFrame implements Runnable {
                 String message = paquete.code_1("server-javkell", "50", "4");
                 msg = message.getBytes();
                 DatagramPacket paquete = new DatagramPacket(msg, msg.length, ip, PUERTO);
-             //   System.out.println("mensaje a enviar" + message);
+                //   System.out.println("mensaje a enviar" + message);
                 s.send(paquete);
-               // System.out.println("mensaje enviado");
+                // System.out.println("mensaje enviado");
             }
         } catch (SocketException ex) {
             Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
@@ -59,33 +59,66 @@ public class servidor extends JFrame implements Runnable {
     public servidor() {
         Thread hiloUDP = new Thread(this);
         hiloUDP.start();
-        hilotcp servertcp=new hilotcp();
-        Thread hiloTCP=new Thread(servertcp);
+       // hilotcp servertcp = new hilotcp();
+      //  Thread hiloTCP = new Thread(servertcp);
+      //  hiloTCP.start();
+        HiloControl controlsocket=new HiloControl();
+        Thread hiloTCP = new Thread(controlsocket);
         hiloTCP.start();
+    }
+    Socket[] clients = new Socket[4];
+    int contClients;
+    hilotcp hTCP[];
+    public class HiloControl implements Runnable{
+        ServerSocket server;
         
+        public HiloControl() {
+            hTCP=new hilotcp[4];
+            try {
+                this.server = new ServerSocket(20060);
+            } catch (IOException ex) {
+                Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    clients[contClients] = server.accept();
+                    System.out.println("Se conecto alguien");
+                } catch (IOException ex) {
+                    Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                hTCP[contClients] = new hilotcp(clients[contClients]);
+                hTCP[contClients].run();
+                contClients++;
+            }
+        }
     }
 
-    public class hilotcp implements Runnable{
+    public class hilotcp implements Runnable {
 
         String clientSentence;
         String capitalizedSentence;
         ServerSocket welcomeSocket;
-        public void hilotcp(){
-            
-         
+        Socket cliente;
+
+        private hilotcp(Socket client) {
+             this.cliente=client;           
         }
+
         @Override
         public void run() {
             try {
-                welcomeSocket = new ServerSocket(20060);
-                Socket connectionSocket = welcomeSocket.accept();
-                BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
-                DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
-                DataInputStream in=new DataInputStream(connectionSocket.getInputStream());
-                byte[] b=new byte[1024];
+                //welcomeSocket = new ServerSocket(20060);
+               // Socket connectionSocket = cliente.accept();
+            //    BufferedReader inFromClient = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
+                DataOutputStream outToClient = new DataOutputStream(cliente.getOutputStream());
+                DataInputStream in = new DataInputStream(cliente.getInputStream());
+                byte[] b = new byte[1024];
                 in.read(b);
-                clientSentence=new String(b).trim();
-                
+                clientSentence = new String(b);
+
                 System.out.println("Received: " + clientSentence);
                 capitalizedSentence = clientSentence.toUpperCase() + '\n';
                 outToClient.writeBytes(capitalizedSentence);
