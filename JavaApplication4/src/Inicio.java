@@ -109,7 +109,6 @@ public class Inicio extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-
         jButton1.setVisible(false);
         jButton2.setVisible(false);
         jLabel1.setVisible(false);
@@ -118,14 +117,14 @@ public class Inicio extends javax.swing.JFrame {
         add(obj.ul);
         System.out.println(obj.ul.getItemAt(0));
         obj.ul.setVisible(true);
-        
+       
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        servidor obj = new servidor();
         jButton1.setVisible(false);
         jButton2.setVisible(false);
         jLabel1.setVisible(false);
+        servidor obj = new servidor();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
@@ -155,13 +154,12 @@ public class Inicio extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-
-        /* Create and display the form */
+        
+                /* Createand display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 new Inicio().setVisible(true);
-                
             }
         });
     }

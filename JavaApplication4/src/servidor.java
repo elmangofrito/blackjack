@@ -25,11 +25,12 @@ public class servidor extends Thread {
     @Override
     public void run() {
         try {
-            int PUERTO = 8050;
+            int PUERTO = 20050;
 
             byte msg[] = new byte[1024];
 
 //Creamos el socket UDP del servidor en el pueto asociado
+            
             DatagramSocket s = new DatagramSocket();
             System.out.println("Servidor Activo");
             InetAddress ip = InetAddress.getByName("localhost");
@@ -39,7 +40,7 @@ public class servidor extends Thread {
             while (true) {
                 String message = paquete.code_1("server-javkell","50","4");
                 msg = message.getBytes();
-                DatagramPacket paquete = new DatagramPacket(msg, msg.length, ip, 8050);
+                DatagramPacket paquete = new DatagramPacket(msg, msg.length, ip, PUERTO);
                 System.out.println("mensaje a enviar" + message);
                 s.send(paquete);
                 System.out.println("mensaje enviado");

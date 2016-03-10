@@ -1,13 +1,20 @@
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import org.json.JSONArray;
+import sun.awt.windows.ThemeReader;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -18,14 +25,14 @@ import javax.swing.JComboBox;
  *
  * @author javier
  */
-public class client implements Runnable {
+public class client extends Thread {
 
     Json paquete;
+    int puerto = 20050;
 
     public client() {
         run();
     }
-
     JComboBox ul;
 
     @Override
@@ -35,7 +42,7 @@ public class client implements Runnable {
             byte[] receiveData;
             DatagramPacket receivePacket;
             ul = new JComboBox();
-            DatagramSocket clientSocket = new DatagramSocket(8050);
+            DatagramSocket clientSocket = new DatagramSocket(puerto);
             Json x = new Json();
             String modifiedSentence;
             while (true) {
@@ -43,10 +50,11 @@ public class client implements Runnable {
                 receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 clientSocket.receive(receivePacket);
                 modifiedSentence = new String(receivePacket.getData()).trim();
-                
-                if(modifiedSentence!=null)
+
+                if (modifiedSentence != null) {
                     addserver(x.deco_1(modifiedSentence, 1).toString());
-                
+                }
+
             }
         } catch (SocketException ex) {
             Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
@@ -56,15 +64,50 @@ public class client implements Runnable {
     }
 
     public void addserver(String msg) {
-        boolean in = false;
+        boolean bandera =false;
         for (int i = 0; i < ul.getItemCount(); i++) {
             if (ul.getItemAt(i).equals(msg)) {
-                in = true;
+                bandera = true;
             }
         }
-        if (!in) {
+        if (!bandera) {
             ul.addItem(msg);
             System.out.println("agregado " + msg);
+        }
+        
+    }
+    Socket cliente=null;
+    String host;
+    DataInputStream in=null;
+    DataOutputStream out=null;
+    public class hilotcp extends Thread {
+
+        public hilotcp() {
+            run();
+        }
+
+        @Override
+        public void run() {
+
+            String msg;
+            try {
+                InetAddress address;
+
+                cliente = new Socket(host, 20060);
+
+                out = new DataOutputStream(cliente.getOutputStream());
+
+                System.out.println("Se conecto.");
+
+                String msgs = "CLIENTE-ANGESUS";
+
+                in = new DataInputStream(cliente.getInputStream());
+
+                address = InetAddress.getLocalHost();
+            } catch (IOException ex) {
+                Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        
         }
     }
 }
