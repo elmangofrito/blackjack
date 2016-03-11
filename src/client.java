@@ -34,11 +34,12 @@ public class client extends JFrame implements Runnable {
     int puerto = 20050;
     JComboBox ul;
     JButton aceptar;
-    Socket cliente = null;
+    
     String host;
     DataInputStream in = null;
     DataOutputStream out = null;
 
+    //-------------------------------------------------------------------
     public client() {
 
         super("Blackjack-Cliente");
@@ -64,14 +65,15 @@ public class client extends JFrame implements Runnable {
             public void actionPerformed(ActionEvent ae) {
                 System.out.println(host);
                 hilotcp obj = new hilotcp();
-                obj.start();
+                Thread hiThread=new Thread(obj);
+                hiThread.start();
             }
         });
 
         Thread hilo = new Thread(this);
         hilo.start();
     }
-
+//---------------server udp-----------------------------------------
     @Override
     public void run() {
         try {
@@ -87,8 +89,10 @@ public class client extends JFrame implements Runnable {
                 receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 clientSocket.receive(receivePacket);
                 modifiedSentence = new String(receivePacket.getData()).trim();
-                host = receivePacket.getAddress().toString().trim().replace("/", "");
-
+                String ip = ""+receivePacket.getAddress();
+                String []separar = ip.split("/");
+                host = separar[1];
+                
                 if (modifiedSentence != null) {
                     addserver(x.deco_1(modifiedSentence, 1).toString());
                 }
@@ -114,8 +118,8 @@ public class client extends JFrame implements Runnable {
         }
         repaint();
     }
-
-    public class hilotcp extends Thread {
+//------------------------server tcp------------------------------------
+    public class hilotcp implements Runnable{
 
         public hilotcp() {
 
@@ -124,19 +128,23 @@ public class client extends JFrame implements Runnable {
         @Override
         public void run() {
             try {
+                
                 String msg;
                 Jugador[] jugadores = new Jugador[3];;
                 Jugador yo=new Jugador(null, 0);
-                cliente = new Socket(host, 20060);
+                System.out.println(host);
+                Socket cliente = new Socket(host, 20060);
+                System.out.println("conecto");
                 out = new DataOutputStream(cliente.getOutputStream());
                 in = new DataInputStream(cliente.getInputStream());
                 System.out.println("Se conecto.");
                 String msgs = paquete.code_2("Cliente-javkell");
-                out.writeUTF(msgs);
+                out.write(msgs.getBytes());
                 System.out.println("envie " + msgs);
-                while (true) {
+                
                     msgs = null;
                     msgs = in.readUTF().trim();
+                    System.out.println(msgs);    
                     switch (paquete.getCode(msgs)) {
                         case 3:
                             if (paquete.deco_3(msgs, 1).toString().compareTo("true") == 0) {
@@ -163,7 +171,7 @@ public class client extends JFrame implements Runnable {
                             
                         default:
                             throw new AssertionError();
-                    }
+                    
                 }
             } catch (IOException ex) {
                 Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);

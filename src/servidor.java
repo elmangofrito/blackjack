@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import static java.lang.Thread.sleep;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
@@ -28,7 +29,7 @@ import javax.swing.JFrame;
 public class servidor extends JFrame implements Runnable {
 
     Json paquete;
-
+    int cont=120;
     @Override
     public void run() {
         try {
@@ -38,15 +39,22 @@ public class servidor extends JFrame implements Runnable {
 //Creamos el socket UDP del servidor en el pueto asociado
             DatagramSocket s = new DatagramSocket();
             System.out.println("Servidor Activo");
-            InetAddress ip = InetAddress.getByName("localhost");
+            InetAddress ip = InetAddress.getByName("192.168.1.255");
             paquete = new Json();
             while (true) {
-                String message = paquete.code_1("server-javkell", "50", "4");
+                try {
+                    sleep(1000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                String message = paquete.code_1("server-javkell", cont, "4");
+                System.out.println(message);
                 msg = message.getBytes();
                 DatagramPacket paquete = new DatagramPacket(msg, msg.length, ip, PUERTO);
                 //   System.out.println("mensaje a enviar" + message);
                 s.send(paquete);
                 // System.out.println("mensaje enviado");
+                cont--;
             }
         } catch (SocketException ex) {
             Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
@@ -89,6 +97,7 @@ public class servidor extends JFrame implements Runnable {
                 hTCP[contClients] = new hilotcp(clients[contClients]);
                 hTCP[contClients].run();
                 contClients++;
+                
             }
         }
     }
@@ -107,16 +116,19 @@ public class servidor extends JFrame implements Runnable {
         @Override
         public void run() {
             try {
-                 DataOutputStream outToClient = new DataOutputStream(cliente.getOutputStream());
+                DataOutputStream outToClient = new DataOutputStream(cliente.getOutputStream());
                 DataInputStream in = new DataInputStream(cliente.getInputStream());
+               
                 
-                
-                clientSentence = in.readUTF();
-
-                nombre=paquete.deco_2(clientSentence, 1).toString();
+                byte[] cli = new byte[1024];
+                in.read(cli);
+                clientSentence=new String(cli);
+                System.out.println(clientSentence);
+                nombre=paquete.deco_2(clientSentence.trim(), 1).toString();
                 System.out.println("recibido: " + nombre);
-                mensaje=paquete.code_3(true, "239.237.55.33", "01");
-                outToClient.writeBytes(mensaje);
+                mensaje=paquete.code_3("true", "239.237.55.33", "01");
+                System.out.println(mensaje);
+                outToClient.write(mensaje.getBytes());
             } catch (IOException ex) {
                 Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
             }
