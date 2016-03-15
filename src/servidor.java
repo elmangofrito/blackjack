@@ -64,7 +64,19 @@ public class servidor extends JFrame implements Runnable {
 
     }
 
-    public servidor() {
+    public servidor(JFrame x) {
+//-----------------jframe------------------------
+        super("Blackjack-Server");
+        x.setLayout(null);
+        x.setResizable(false);
+        x.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        x.setSize(300, 500);
+        x.setLocationRelativeTo(null);
+        x.setVisible(true);
+        
+        
+        
+        
         Thread hiloUDP = new Thread(this);
         hiloUDP.start();
         HiloControl controlsocket=new HiloControl();
