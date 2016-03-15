@@ -101,7 +101,7 @@ public class Inicio extends javax.swing.JFrame {
         jButton1.setVisible(false);
         jButton2.setVisible(false);
         jLabel1.setVisible(false);
-        
+        this.setVisible(false);
         servidor serv=new servidor(this);
                 
     }//GEN-LAST:event_jButton1ActionPerformed

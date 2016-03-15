@@ -162,7 +162,7 @@ public class client extends JFrame implements Runnable {
                             break;
                         case 7:
                             if (yo.getId() == (Integer.parseInt(paquete.deco_7(msgs.trim(), 1).toString()))) {
-                                out.writeUTF(paquete.code_8(true));
+                                out.write(paquete.code_8(true).getBytes());
                             }
                             break;
 

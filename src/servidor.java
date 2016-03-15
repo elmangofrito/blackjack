@@ -44,9 +44,10 @@ public class servidor extends JFrame implements Runnable {
         setLayout(null);
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(300, 200);
+        setSize(300, 500);
         setLocationRelativeTo(null);
         setVisible(true);
+        
 
         Thread hiloUDP = new Thread(this);
         hiloUDP.start();
@@ -90,7 +91,10 @@ public class servidor extends JFrame implements Runnable {
     }
 
     public void addcliente(String nombre) {
-        cliente.setText(nombre);
+        JLabel cliente=new JLabel(nombre);
+        cliente.setBounds(50, 50*(contClients+1), 100, 20);
+        add(cliente);
+        cliente.setVisible(true);
         System.out.println("add hecho");
         repaint();
 
