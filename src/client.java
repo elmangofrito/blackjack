@@ -34,11 +34,10 @@ public class client extends JFrame implements Runnable {
     int puerto = 20050;
     JComboBox ul;
     JButton aceptar;
-    
     String host;
     DataInputStream in = null;
     DataOutputStream out = null;
-
+    byte[] cli = new byte[1024];
     //-------------------------------------------------------------------
     public client() {
 
@@ -141,29 +140,28 @@ public class client extends JFrame implements Runnable {
                 String msgs = paquete.code_2("Cliente-javkell");
                 out.write(msgs.getBytes());
                 System.out.println("envie " + msgs);
-                
-                    msgs = null;
-                    msgs = in.readUTF().trim();
+                    in.read(cli);
+                    msgs = new String(cli);
                     System.out.println(msgs);    
-                    switch (paquete.getCode(msgs)) {
+                    switch (paquete.getCode(msgs.trim())) {
                         case 3:
-                            if (paquete.deco_3(msgs, 1).toString().compareTo("true") == 0) {
-                                 yo = new Jugador("Cliente-javkell", Integer.parseInt(paquete.deco_3(msgs, 4).toString()));
+                            if (paquete.deco_3(msgs.trim(), 1).toString().compareTo("true") == 0) {
+                                 yo = new Jugador("Cliente-javkell", Integer.parseInt(paquete.deco_3(msgs.trim(), 3).toString()));
                             }
                             break;
                         case 4:
 
                             for (int i = 0; i < jugadores.length; i++) {
-                                jugadores[i] = new Jugador(paquete.deco_4(msgs, i + 1).toString(),Integer.parseInt( paquete.deco_4(msgs, i + 2).toString()));
+                                jugadores[i] = new Jugador(paquete.deco_4(msgs.trim(), i + 1).toString(),Integer.parseInt( paquete.deco_4(msgs, i + 2).toString()));
                             }
                             break;
                         case 5:
                             for (int i = 0; i < jugadores.length; i++) {
-                                jugadores[i].setPuntaje(Integer.parseInt(paquete.deco_5(msgs, +1).toString()));
+                                jugadores[i].setPuntaje(Integer.parseInt(paquete.deco_5(msgs.trim(), +1).toString()));
                             }
                             break;
                         case 7:
-                            if (yo.getId() == (Integer.parseInt(paquete.deco_7(msgs, 1).toString()))) {
+                            if (yo.getId() == (Integer.parseInt(paquete.deco_7(msgs.trim(), 1).toString()))) {
                                 out.writeUTF(paquete.code_8(true));
                             }
                             break;

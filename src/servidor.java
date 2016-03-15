@@ -1,4 +1,5 @@
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -16,6 +17,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -26,20 +28,25 @@ import javax.swing.JFrame;
  *
  * @author javier
  */
-public class servidor extends JFrame implements Runnable {
+public class servidor implements Runnable {
 
     Json paquete;
     int cont=120;
+    JFrame frameserver;
+    Socket[] clients = new Socket[4];
+    int contClients;
+    hilotcp hTCP[];
+//--------------------------udp-----------------------------------------------    
     @Override
     public void run() {
         try {
             int PUERTO = 20050;
             byte msg[] = new byte[1024];
 
-//Creamos el socket UDP del servidor en el pueto asociado
+
             DatagramSocket s = new DatagramSocket();
             System.out.println("Servidor Activo");
-            InetAddress ip = InetAddress.getByName("192.168.1.255");
+            InetAddress ip = InetAddress.getByName("255.255.255.255");
             paquete = new Json();
             while (true) {
                 try {
@@ -47,7 +54,7 @@ public class servidor extends JFrame implements Runnable {
                 } catch (InterruptedException ex) {
                     Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                String message = paquete.code_1("server-javkell", cont, "4");
+                String message = paquete.code_1("server-javkell", cont, 4-contClients);
                 System.out.println(message);
                 msg = message.getBytes();
                 DatagramPacket paquete = new DatagramPacket(msg, msg.length, ip, PUERTO);
@@ -66,13 +73,14 @@ public class servidor extends JFrame implements Runnable {
 
     public servidor(JFrame x) {
 //-----------------jframe------------------------
-        super("Blackjack-Server");
-        x.setLayout(null);
-        x.setResizable(false);
-        x.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        x.setSize(300, 500);
-        x.setLocationRelativeTo(null);
-        x.setVisible(true);
+        // super("Blackjack-Server");
+        frameserver=x;
+        frameserver.setLayout(null);
+        frameserver.setResizable(false);
+        frameserver.setDefaultCloseOperation(frameserver.EXIT_ON_CLOSE);
+        frameserver.setSize(300, 500);
+        frameserver.setLocationRelativeTo(null);
+        frameserver.setVisible(true);
         
         
         
@@ -83,9 +91,19 @@ public class servidor extends JFrame implements Runnable {
         Thread hiloTCP = new Thread(controlsocket);
         hiloTCP.start();
     }
-    Socket[] clients = new Socket[4];
-    int contClients;
-    hilotcp hTCP[];
+    
+    public void addcliente(String nombre){
+        JLabel cliente=new JLabel(nombre);
+        cliente.setSize(100, 100);
+        cliente.setBackground(Color.yellow);
+        cliente.setLocation(30, 30);
+        cliente.setVisible(true);
+        frameserver.add(cliente);
+        System.out.println("add hecho");
+        frameserver.repaint();
+    
+    }
+//------------------------------tcp---------------------------------------    
     public class HiloControl implements Runnable{
         ServerSocket server;
         
@@ -138,7 +156,8 @@ public class servidor extends JFrame implements Runnable {
                 System.out.println(clientSentence);
                 nombre=paquete.deco_2(clientSentence.trim(), 1).toString();
                 System.out.println("recibido: " + nombre);
-                mensaje=paquete.code_3("true", "239.237.55.33", "01");
+                addcliente(nombre);
+                mensaje=paquete.code_3(true, "239.237.55.33", "01");
                 System.out.println(mensaje);
                 outToClient.write(mensaje.getBytes());
             } catch (IOException ex) {
