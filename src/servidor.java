@@ -28,21 +28,39 @@ import javax.swing.JLabel;
  *
  * @author javier
  */
-public class servidor implements Runnable {
+public class servidor extends JFrame implements Runnable {
 
     Json paquete;
-    int cont=120;
-    JFrame frameserver;
+    int cont = 120;
     Socket[] clients = new Socket[4];
     int contClients;
     hilotcp hTCP[];
+    JLabel cliente;
+
+    public servidor(JFrame x) {
+//-----------------jframe------------------------
+
+        super("Blackjack-Server");
+        setLayout(null);
+        setResizable(false);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(300, 200);
+        setLocationRelativeTo(null);
+        setVisible(true);
+
+        Thread hiloUDP = new Thread(this);
+        hiloUDP.start();
+        HiloControl controlsocket = new HiloControl();
+        Thread hiloTCP = new Thread(controlsocket);
+        hiloTCP.start();
+    }
 //--------------------------udp-----------------------------------------------    
+
     @Override
     public void run() {
         try {
             int PUERTO = 20050;
             byte msg[] = new byte[1024];
-
 
             DatagramSocket s = new DatagramSocket();
             System.out.println("Servidor Activo");
@@ -54,7 +72,7 @@ public class servidor implements Runnable {
                 } catch (InterruptedException ex) {
                     Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                String message = paquete.code_1("server-javkell", cont, 4-contClients);
+                String message = paquete.code_1("server-javkell", cont, 4 - contClients);
                 System.out.println(message);
                 msg = message.getBytes();
                 DatagramPacket paquete = new DatagramPacket(msg, msg.length, ip, PUERTO);
@@ -71,50 +89,27 @@ public class servidor implements Runnable {
 
     }
 
-    public servidor(JFrame x) {
-//-----------------jframe------------------------
-        // super("Blackjack-Server");
-        frameserver=x;
-        frameserver.setLayout(null);
-        frameserver.setResizable(false);
-        frameserver.setDefaultCloseOperation(frameserver.EXIT_ON_CLOSE);
-        frameserver.setSize(300, 500);
-        frameserver.setLocationRelativeTo(null);
-        frameserver.setVisible(true);
-        
-        
-        
-        
-        Thread hiloUDP = new Thread(this);
-        hiloUDP.start();
-        HiloControl controlsocket=new HiloControl();
-        Thread hiloTCP = new Thread(controlsocket);
-        hiloTCP.start();
-    }
-    
-    public void addcliente(String nombre){
-        JLabel cliente=new JLabel(nombre);
-        cliente.setSize(100, 100);
-        cliente.setBackground(Color.yellow);
-        cliente.setLocation(30, 30);
-        cliente.setVisible(true);
-        frameserver.add(cliente);
+    public void addcliente(String nombre) {
+        cliente.setText(nombre);
         System.out.println("add hecho");
-        frameserver.repaint();
-    
+        repaint();
+
     }
 //------------------------------tcp---------------------------------------    
-    public class HiloControl implements Runnable{
+
+    public class HiloControl implements Runnable {
+
         ServerSocket server;
-        
+
         public HiloControl() {
-            hTCP=new hilotcp[4];
+            hTCP = new hilotcp[4];
             try {
                 this.server = new ServerSocket(20060);
             } catch (IOException ex) {
                 Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+
         @Override
         public void run() {
             while (true) {
@@ -127,20 +122,20 @@ public class servidor implements Runnable {
                 hTCP[contClients] = new hilotcp(clients[contClients]);
                 hTCP[contClients].run();
                 contClients++;
-                
+
             }
         }
     }
 
     public class hilotcp implements Runnable {
 
-        String clientSentence,nombre;
+        String clientSentence, nombre;
         String mensaje;
         ServerSocket welcomeSocket;
         Socket cliente;
-        
+
         private hilotcp(Socket client) {
-             this.cliente=client;           
+            this.cliente = client;
         }
 
         @Override
@@ -148,16 +143,15 @@ public class servidor implements Runnable {
             try {
                 DataOutputStream outToClient = new DataOutputStream(cliente.getOutputStream());
                 DataInputStream in = new DataInputStream(cliente.getInputStream());
-               
-                
+
                 byte[] cli = new byte[1024];
                 in.read(cli);
-                clientSentence=new String(cli);
+                clientSentence = new String(cli);
                 System.out.println(clientSentence);
-                nombre=paquete.deco_2(clientSentence.trim(), 1).toString();
+                nombre = paquete.deco_2(clientSentence.trim(), 1).toString();
                 System.out.println("recibido: " + nombre);
                 addcliente(nombre);
-                mensaje=paquete.code_3(true, "239.237.55.33", "01");
+                mensaje = paquete.code_3(true, "239.237.55.33", "01");
                 System.out.println(mensaje);
                 outToClient.write(mensaje.getBytes());
             } catch (IOException ex) {
