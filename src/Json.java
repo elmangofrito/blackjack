@@ -21,9 +21,9 @@ import org.json.JSONObject;
 public class Json {
 
     JsonObject paquete = new JsonObject();
-    String cadena_JSON=new String();
-    JsonObject[] vec=new JsonObject[4];
-    Jugador[] jug=new Jugador[4];
+    String cadena_JSON = new String();
+    JsonObject[] vec = new JsonObject[4];
+    Jugador[] jug = new Jugador[4];
 
     public int getCode(String recv) {
         JsonParser parser = new JsonParser();
@@ -32,9 +32,6 @@ public class Json {
         return Objeto.getAsJsonObject().get("codigo").getAsInt();
     }
 
-    
-
-    
     public String code_1(Object nombre, Object tiempo, Object espacios) {
         paquete.addProperty("codigo", 1);
         paquete.addProperty("nombre", nombre.toString());
@@ -124,50 +121,42 @@ public class Json {
 
     public String code_4(Object jugadores) {
         paquete.addProperty("codigo", 4);
-        String aux="";
+        String aux = "";
         String[] separar = jugadores.toString().trim().split(" ");
-        for (int i = 0; i < separar.length/2; i++) {
-            vec[i]=new JsonObject();
-            vec[i].addProperty("nombre",separar[i*2]);
-            vec[i].addProperty("id_asignado",separar[(i*2)+1]);
-            aux=aux+vec[i].toString();
+        for (int i = 0; i < separar.length / 2; i++) {
+            vec[i] = new JsonObject();
+            vec[i].addProperty("nombre", separar[i * 2]);
+            vec[i].addProperty("id_asignado", separar[(i * 2) + 1]);
+            aux = aux + vec[i].toString();
         }
         paquete.addProperty("jugadores", aux);
-        
-        cadena_JSON =paquete.toString();
+
+        cadena_JSON = paquete.toString();
         return cadena_JSON;
     }
 
     public Object deco_4(String JSON, int opcion) {
         JsonParser parser = new JsonParser();
         JsonElement Objeto = parser.parse(JSON);
-        
+
         if (opcion == 0) {
             return Objeto.getAsJsonObject().get("codigo").getAsInt();
         }
         if (opcion == 1) {
-            System.out.println(Objeto.getAsJsonObject().get("jugadores").toString().substring(1,Objeto.getAsJsonObject().get("jugadores").toString().length()-1 ));
-            
-            String aux=Objeto.getAsJsonObject().get("jugadores").toString().substring(1,Objeto.getAsJsonObject().get("jugadores").toString().length()-1 );
-            
-            char c = (char)92; 
-            char x=(char)65;
-            
-            aux=aux.replace(c , x);
-            aux=aux.replace("A", "");
-            aux=aux.trim();
-            System.out.println(aux); 
+            String aux = Objeto.getAsJsonObject().get("jugadores").toString().substring(1, Objeto.getAsJsonObject().get("jugadores").toString().length() - 1);
+            char c = (char) 92;
+            char x = (char) 65;
+            aux = aux.replace(c, x);
+            aux = aux.replace("A", "");
+            aux = aux.trim();
+            System.out.println(aux);
             String[] separar = aux.split("}");
             for (int i = 0; i < separar.length; i++) {
-                separar[i]=separar[i]+"}"; 
+                separar[i] = separar[i] + "}";
                 System.out.println(separar[i]);
             }
-            
-           
-            
-            
-        }
-         else {
+
+        } else {
             System.err.println("error");
         }
         return null;
@@ -245,6 +234,7 @@ public class Json {
         }
         return null;
     }
+
     public String code_7(Object id) {
         paquete.addProperty("codigo", 7);
         paquete.addProperty("id", id.toString());
@@ -266,6 +256,7 @@ public class Json {
         }
         return null;
     }
+
     public String code_8(Object jugar) {
         paquete.addProperty("codigo", 8);
         paquete.addProperty("jugar", jugar.toString());
@@ -276,7 +267,6 @@ public class Json {
     public Object deco_8(String JSON, int opcion) {
         JsonParser parser = new JsonParser();
         JsonElement Objeto = parser.parse(JSON);
-
         if (opcion == 0) {
             return Objeto.getAsJsonObject().get("codigo").getAsInt();
         }
@@ -286,8 +276,9 @@ public class Json {
             System.err.println("error");
         }
         return null;
-    } 
-    public String code_9(Object ID,Object CARTA) {
+    }
+
+    public String code_9(Object ID, Object CARTA) {
         paquete.addProperty("codigo", 9);
         paquete.addProperty("id", ID.toString());
         paquete.addProperty("carta", CARTA.toString());
@@ -298,7 +289,6 @@ public class Json {
     public Object deco_9(String JSON, int opcion) {
         JsonParser parser = new JsonParser();
         JsonElement Objeto = parser.parse(JSON);
-
         if (opcion == 0) {
             return Objeto.getAsJsonObject().get("codigo").getAsInt();
         }
@@ -311,10 +301,9 @@ public class Json {
             System.err.println("error");
         }
         return null;
-    }     
-    
-    public String code_10(Object RONDAS,Object CARTAS,Object jugador1, Object idjugador1, Object jugador2, Object idjugador2, Object jugador3, Object idjugador3, Object jugador4, Object idjugador4) {
+    }
 
+    public String code_10(Object RONDAS, Object CARTAS, Object jugador1, Object idjugador1, Object jugador2, Object idjugador2, Object jugador3, Object idjugador3, Object jugador4, Object idjugador4) {
         paquete.addProperty("codigo", 10);
         paquete.addProperty("rondas", RONDAS.toString());
         paquete.addProperty("cartas_jugadas", CARTAS.toString());
@@ -333,8 +322,6 @@ public class Json {
     public Object deco_10(String JSON, int opcion) {
         JsonParser parser = new JsonParser();
         JsonElement Objeto = parser.parse(JSON);
-        
-
         if (opcion == 0) {
             return Objeto.getAsJsonObject().get("codigo").getAsInt();
         }
@@ -371,28 +358,27 @@ public class Json {
             System.err.println("error");
         }
         return null;
-    } 
-    public String code_11(Object ID) {
+    }
 
+    public String code_11(Object ID) {
         paquete.addProperty("codigo", 11);
         paquete.addProperty("id", ID.toString());
         cadena_JSON = paquete.toString();
         return cadena_JSON;
-    }    
-     public Object deco_11(String JSON, int opcion) {
+    }
+
+    public Object deco_11(String JSON, int opcion) {
         JsonParser parser = new JsonParser();
         JsonElement Objeto = parser.parse(JSON);
-        
 
         if (opcion == 0) {
             return Objeto.getAsJsonObject().get("codigo").getAsInt();
         }
         if (opcion == 1) {
             return Objeto.getAsJsonObject().get("id").getAsInt();
-        }
-        else {
+        } else {
             System.err.println("error");
         }
         return null;
-    } 
+    }
 }

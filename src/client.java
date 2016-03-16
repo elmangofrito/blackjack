@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.logging.Level;
@@ -148,7 +149,7 @@ public class client extends JFrame implements Runnable {
                 while (true) {
                     out = new DataOutputStream(cliente.getOutputStream());
                     in = new DataInputStream(cliente.getInputStream());
-                    
+
                     cli = new byte[1024];
                     in.read(cli);
                     msgs = new String(cli);
@@ -160,7 +161,7 @@ public class client extends JFrame implements Runnable {
                             }
                             break;
                         case 4:
-                            
+
                             paquete.deco_4(msgs.trim(), 1);
 
                             /*      for (int i = 0; i < jugadores.length; i++) {
@@ -188,4 +189,29 @@ public class client extends JFrame implements Runnable {
 
         }
     }
+
+    public class hiloMulticastClient implements Runnable {
+
+        public void run() {
+
+            try {
+                byte[] b = new byte[100];
+                DatagramPacket dgram = new DatagramPacket(b, b.length);
+                MulticastSocket socket = new MulticastSocket(4000);
+                socket.joinGroup(InetAddress.getByName("235.1.1.1"));
+
+                while (true) {
+                    socket.receive(dgram); // Se bloquea hasta que llegue un datagrama
+                    System.err.println("Recivido " + dgram.getLength()
+                            + " bytes de " + dgram.getAddress() + " " + new String(dgram.getData()));
+
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+
+    }
+
 }

@@ -10,6 +10,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -179,4 +180,37 @@ public class servidor extends JFrame implements Runnable {
 
         }
     }
+    
+    
+    public class hiloMulticastServer implements Runnable{
+
+    @Override
+    public void run() {
+        
+
+        try {
+            MulticastSocket socket = new MulticastSocket();
+            
+            
+            byte[] b = "Martin Gigena".getBytes();
+            DatagramPacket dgram;
+            
+            dgram = new DatagramPacket(b, b.length,InetAddress.getByName("235.1.1.1"), 4000);
+            
+            System.err.println("Enviando " + b.length + " bytes a " +
+                    dgram.getAddress() + ':' + dgram.getPort());
+            while(true) {
+                System.err.print(".");
+                socket.send(dgram);
+               
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+       
+    }
+
+}
+    
 }
