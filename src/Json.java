@@ -5,6 +5,7 @@
  */
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -20,7 +21,9 @@ import org.json.JSONObject;
 public class Json {
 
     JsonObject paquete = new JsonObject();
-    String cadena_JSON;
+    String cadena_JSON=new String();
+    JsonObject[] vec=new JsonObject[4];
+    Jugador[] jug=new Jugador[4];
 
     public int getCode(String recv) {
         JsonParser parser = new JsonParser();
@@ -29,6 +32,9 @@ public class Json {
         return Objeto.getAsJsonObject().get("codigo").getAsInt();
     }
 
+    
+
+    
     public String code_1(Object nombre, Object tiempo, Object espacios) {
         paquete.addProperty("codigo", 1);
         paquete.addProperty("nombre", nombre.toString());
@@ -116,52 +122,52 @@ public class Json {
         return null;
     }
 
-    public String code_4(Object jugador1, Object idjugador1, Object jugador2, Object idjugador2, Object jugador3, Object idjugador3, Object jugador4, Object idjugador4) {
+    public String code_4(Object jugadores) {
         paquete.addProperty("codigo", 4);
-        paquete.addProperty("jugador1", jugador1.toString());
-        paquete.addProperty("id1", idjugador1.toString());
-        paquete.addProperty("jugador2", jugador2.toString());
-        paquete.addProperty("id2", idjugador2.toString());
-        paquete.addProperty("jugador3", jugador3.toString());
-        paquete.addProperty("id3", idjugador3.toString());
-        paquete.addProperty("jugador4", jugador4.toString());
-        paquete.addProperty("id4", idjugador4.toString());
-
-        cadena_JSON = paquete.toString();
+        String aux="";
+        String[] separar = jugadores.toString().trim().split(" ");
+        for (int i = 0; i < separar.length/2; i++) {
+            vec[i]=new JsonObject();
+            vec[i].addProperty("nombre",separar[i*2]);
+            vec[i].addProperty("id_asignado",separar[(i*2)+1]);
+            aux=aux+vec[i].toString();
+        }
+        paquete.addProperty("jugadores", aux);
+        
+        cadena_JSON =paquete.toString();
         return cadena_JSON;
     }
 
     public Object deco_4(String JSON, int opcion) {
         JsonParser parser = new JsonParser();
         JsonElement Objeto = parser.parse(JSON);
-
+        
         if (opcion == 0) {
             return Objeto.getAsJsonObject().get("codigo").getAsInt();
         }
         if (opcion == 1) {
-            return Objeto.getAsJsonObject().get("jugador1").getAsString();
+            System.out.println(Objeto.getAsJsonObject().get("jugadores").toString().substring(1,Objeto.getAsJsonObject().get("jugadores").toString().length()-1 ));
+            
+            String aux=Objeto.getAsJsonObject().get("jugadores").toString().substring(1,Objeto.getAsJsonObject().get("jugadores").toString().length()-1 );
+            
+            char c = (char)92; 
+            char x=(char)65;
+            
+            aux=aux.replace(c , x);
+            aux=aux.replace("A", "");
+            aux=aux.trim();
+            System.out.println(aux); 
+            String[] separar = aux.split("}");
+            for (int i = 0; i < separar.length; i++) {
+                separar[i]=separar[i]+"}"; 
+                System.out.println(separar[i]);
+            }
+            
+           
+            
+            
         }
-        if (opcion == 2) {
-            return Objeto.getAsJsonObject().get("id1").getAsString();
-        }
-        if (opcion == 3) {
-            return Objeto.getAsJsonObject().get("jugador2").getAsString();
-        }
-        if (opcion == 4) {
-            return Objeto.getAsJsonObject().get("id2").getAsString();
-        }
-        if (opcion == 5) {
-            return Objeto.getAsJsonObject().get("jugador3").getAsString();
-        }
-        if (opcion == 6) {
-            return Objeto.getAsJsonObject().get("id3").getAsString();
-        }
-        if (opcion == 7) {
-            return Objeto.getAsJsonObject().get("jugador4").getAsString();
-        }
-        if (opcion == 8) {
-            return Objeto.getAsJsonObject().get("id4").getAsString();
-        } else {
+         else {
             System.err.println("error");
         }
         return null;

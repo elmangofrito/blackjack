@@ -38,6 +38,9 @@ public class client extends JFrame implements Runnable {
     DataInputStream in = null;
     DataOutputStream out = null;
     byte[] cli = new byte[1024];
+    DatagramSocket clientSocket;
+    Thread hilo;
+
     //-------------------------------------------------------------------
     public client() {
 
@@ -62,17 +65,20 @@ public class client extends JFrame implements Runnable {
         aceptar.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
+                hilo.stop();
+                clientSocket.close();
                 System.out.println(host);
                 hilotcp obj = new hilotcp();
-                Thread hiThread=new Thread(obj);
+                Thread hiThread = new Thread(obj);
                 hiThread.start();
             }
         });
 
-        Thread hilo = new Thread(this);
+        hilo = new Thread(this);
         hilo.start();
     }
 //---------------server udp-----------------------------------------
+
     @Override
     public void run() {
         try {
@@ -80,23 +86,22 @@ public class client extends JFrame implements Runnable {
             BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
             byte[] receiveData;
             DatagramPacket receivePacket;
-            DatagramSocket clientSocket = new DatagramSocket(puerto);
+            clientSocket = new DatagramSocket(puerto);
             Json x = new Json();
             String modifiedSentence;
-            while (true) {
-                receiveData = new byte[1024];
-                receivePacket = new DatagramPacket(receiveData, receiveData.length);
-                clientSocket.receive(receivePacket);
-                modifiedSentence = new String(receivePacket.getData()).trim();
-                String ip = ""+receivePacket.getAddress();
-                String []separar = ip.split("/");
-                host = separar[1];
-                
-                if (modifiedSentence != null) {
-                    addserver(x.deco_1(modifiedSentence, 1).toString());
-                }
 
+            receiveData = new byte[1024];
+            receivePacket = new DatagramPacket(receiveData, receiveData.length);
+            clientSocket.receive(receivePacket);
+            modifiedSentence = new String(receivePacket.getData()).trim();
+            String ip = "" + receivePacket.getAddress();
+            String[] separar = ip.split("/");
+            host = separar[1];
+
+            if (modifiedSentence != null) {
+                addserver(x.deco_1(modifiedSentence, 1).toString());
             }
+
         } catch (SocketException ex) {
             Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -118,7 +123,8 @@ public class client extends JFrame implements Runnable {
         repaint();
     }
 //------------------------server tcp------------------------------------
-    public class hilotcp implements Runnable{
+
+    public class hilotcp implements Runnable {
 
         public hilotcp() {
 
@@ -127,10 +133,9 @@ public class client extends JFrame implements Runnable {
         @Override
         public void run() {
             try {
-                
                 String msg;
                 Jugador[] jugadores = new Jugador[3];;
-                Jugador yo=new Jugador(null, 0);
+                Jugador yo = new Jugador(null, 0);
                 System.out.println(host);
                 Socket cliente = new Socket(host, 20060);
                 System.out.println("conecto");
@@ -140,21 +145,28 @@ public class client extends JFrame implements Runnable {
                 String msgs = paquete.code_2("Cliente-javkell");
                 out.write(msgs.getBytes());
                 System.out.println("envie " + msgs);
+                while (true) {
+                    out = new DataOutputStream(cliente.getOutputStream());
+                    in = new DataInputStream(cliente.getInputStream());
+                    
+                    cli = new byte[1024];
                     in.read(cli);
                     msgs = new String(cli);
-                    System.out.println(msgs);    
+                    System.out.println(msgs);
                     switch (paquete.getCode(msgs.trim())) {
                         case 3:
                             if (paquete.deco_3(msgs.trim(), 1).toString().compareTo("true") == 0) {
-                                 yo = new Jugador("Cliente-javkell", Integer.parseInt(paquete.deco_3(msgs.trim(), 3).toString()));
+                                yo = new Jugador("Cliente-javkell", Integer.parseInt(paquete.deco_3(msgs.trim(), 3).toString()));
                             }
                             break;
                         case 4:
+                            
+                            paquete.deco_4(msgs.trim(), 1);
 
-                            for (int i = 0; i < jugadores.length; i++) {
-                                jugadores[i] = new Jugador(paquete.deco_4(msgs.trim(), i + 1).toString(),Integer.parseInt( paquete.deco_4(msgs, i + 2).toString()));
-                            }
-                            break;
+                            /*      for (int i = 0; i < jugadores.length; i++) {
+                             jugadores[i] = new Jugador(paquete.deco_4(msgs.trim(), i + 1).toString(),Integer.parseInt( paquete.deco_4(msgs, i + 2).toString()));
+                             }
+                             */ break;
                         case 5:
                             for (int i = 0; i < jugadores.length; i++) {
                                 jugadores[i].setPuntaje(Integer.parseInt(paquete.deco_5(msgs.trim(), +1).toString()));
@@ -166,10 +178,9 @@ public class client extends JFrame implements Runnable {
                             }
                             break;
 
-                            
                         default:
                             throw new AssertionError();
-                    
+                    }
                 }
             } catch (IOException ex) {
                 Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);

@@ -36,6 +36,10 @@ public class servidor extends JFrame implements Runnable {
     int contClients;
     hilotcp hTCP[];
     JLabel cliente;
+    DatagramSocket s;
+    Thread hiloUDP;
+    HiloControl controlsocket;
+    ServerSocket server;
 
     public servidor(JFrame x) {
 //-----------------jframe------------------------
@@ -47,11 +51,10 @@ public class servidor extends JFrame implements Runnable {
         setSize(300, 500);
         setLocationRelativeTo(null);
         setVisible(true);
-        
 
-        Thread hiloUDP = new Thread(this);
+        hiloUDP = new Thread(this);
         hiloUDP.start();
-        HiloControl controlsocket = new HiloControl();
+        controlsocket = new HiloControl();
         Thread hiloTCP = new Thread(controlsocket);
         hiloTCP.start();
     }
@@ -63,11 +66,12 @@ public class servidor extends JFrame implements Runnable {
             int PUERTO = 20050;
             byte msg[] = new byte[1024];
 
-            DatagramSocket s = new DatagramSocket();
+            s = new DatagramSocket();
             System.out.println("Servidor Activo");
             InetAddress ip = InetAddress.getByName("255.255.255.255");
-            paquete = new Json();
+
             while (true) {
+                paquete = new Json();
                 try {
                     sleep(1000);
                 } catch (InterruptedException ex) {
@@ -91,8 +95,8 @@ public class servidor extends JFrame implements Runnable {
     }
 
     public void addcliente(String nombre) {
-        JLabel cliente=new JLabel(nombre);
-        cliente.setBounds(50, 50*(contClients+1), 100, 20);
+        JLabel cliente = new JLabel(nombre);
+        cliente.setBounds(50, 50 * (contClients + 1), 100, 20);
         add(cliente);
         cliente.setVisible(true);
         System.out.println("add hecho");
@@ -103,12 +107,10 @@ public class servidor extends JFrame implements Runnable {
 
     public class HiloControl implements Runnable {
 
-        ServerSocket server;
-
         public HiloControl() {
             hTCP = new hilotcp[4];
             try {
-                this.server = new ServerSocket(20060);
+                server = new ServerSocket(20060);
             } catch (IOException ex) {
                 Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -118,14 +120,16 @@ public class servidor extends JFrame implements Runnable {
         public void run() {
             while (true) {
                 try {
+
                     clients[contClients] = server.accept();
                     System.out.println("Se conecto alguien");
+                    hTCP[contClients] = new hilotcp(clients[contClients]);
+                    hTCP[contClients].run();
+                    contClients++;
+
                 } catch (IOException ex) {
                     Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                hTCP[contClients] = new hilotcp(clients[contClients]);
-                hTCP[contClients].run();
-                contClients++;
 
             }
         }
@@ -147,7 +151,7 @@ public class servidor extends JFrame implements Runnable {
             try {
                 DataOutputStream outToClient = new DataOutputStream(cliente.getOutputStream());
                 DataInputStream in = new DataInputStream(cliente.getInputStream());
-
+                paquete = new Json();
                 byte[] cli = new byte[1024];
                 in.read(cli);
                 clientSentence = new String(cli);
@@ -155,9 +159,20 @@ public class servidor extends JFrame implements Runnable {
                 nombre = paquete.deco_2(clientSentence.trim(), 1).toString();
                 System.out.println("recibido: " + nombre);
                 addcliente(nombre);
-                mensaje = paquete.code_3(true, "239.237.55.33", "01");
+                mensaje = paquete.code_3(true, "239.237.55.33", contClients);
                 System.out.println(mensaje);
                 outToClient.write(mensaje.getBytes());
+                mensaje = null;
+                paquete = new Json();
+                mensaje = paquete.code_4("javier 01 kelly 02 jesus 03");
+                outToClient.write(mensaje.getBytes());
+                
+                System.out.println(mensaje);
+                if (contClients == 3) {
+                    hiloUDP.stop();
+                    s.close();
+
+                }
             } catch (IOException ex) {
                 Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
             }
