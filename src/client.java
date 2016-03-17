@@ -35,6 +35,7 @@ public class client extends JFrame implements Runnable {
     int puerto_udp = 20050;
     int puerto_tcp = 20060;
     int puerto_mtc = 20070;
+    String dir_mtc;
     JComboBox ul;
     JButton aceptar;
     String host;
@@ -43,8 +44,10 @@ public class client extends JFrame implements Runnable {
     byte[] cli = new byte[1024];
     DatagramSocket clientSocket;
     Thread hilo;
+    Jugador jugadores[];
 
     //-------------------------------------------------------------------
+
     public client() {
 
         super("Blackjack-Cliente");
@@ -145,75 +148,80 @@ public class client extends JFrame implements Runnable {
                 out = new DataOutputStream(cliente.getOutputStream());
                 in = new DataInputStream(cliente.getInputStream());
                 System.out.println("Se conecto.");
-                String msgs = paquete.code_2("Cliente-javkell");
+                String msgs = paquete.code_2("Cliente-javkelldan");
                 out.write(msgs.getBytes());
                 System.out.println("envie " + msgs);
-                while (true) {
-                    out = new DataOutputStream(cliente.getOutputStream());
-                    in = new DataInputStream(cliente.getInputStream());
+                in.read(cli);
+                msgs=new String(cli);
+                yo = new Jugador("Cliente-javkell", Integer.parseInt(paquete.deco_3(msgs.trim(), 3).toString()));
+                dir_mtc=paquete.deco_3(msgs.trim(), 2).toString();
+                cli = new byte[1024];
+                new juego_cliente();
+            
 
-                    cli = new byte[1024];
-                    in.read(cli);
-                    msgs = new String(cli);
-                    System.out.println(msgs);
-                    switch (paquete.getCode(msgs.trim())) {
-                        case 3:
-                            if (paquete.deco_3(msgs.trim(), 1).toString().compareTo("true") == 0) {
-                                yo = new Jugador("Cliente-javkell", Integer.parseInt(paquete.deco_3(msgs.trim(), 3).toString()));
-                            }
-                            break;
-                        case 4:
+        }
+        catch (IOException ex
 
-                            paquete.deco_4(msgs.trim(), 1);
+        
+            ) {
+                Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-                            /*      for (int i = 0; i < jugadores.length; i++) {
-                             jugadores[i] = new Jugador(paquete.deco_4(msgs.trim(), i + 1).toString(),Integer.parseInt( paquete.deco_4(msgs, i + 2).toString()));
-                             }
-                             */ break;
-                        case 5:
-                            for (int i = 0; i < jugadores.length; i++) {
-                                jugadores[i].setPuntaje(Integer.parseInt(paquete.deco_5(msgs.trim(), +1).toString()));
-                            }
-                            break;
-                        case 7:
-                            if (yo.getId() == (Integer.parseInt(paquete.deco_7(msgs.trim(), 1).toString()))) {
-                                out.write(paquete.code_8(true).getBytes());
-                            }
-                            break;
+    }
+}
 
-                        default:
-                            throw new AssertionError();
+public class juego_cliente implements Runnable {
+
+    public juego_cliente() {
+        run();
+    }
+
+    public void run() {
+
+        try {
+            byte[] b = new byte[1024];
+            DatagramPacket dgram = new DatagramPacket(b, b.length);
+            MulticastSocket socket = new MulticastSocket(puerto_mtc);
+            System.out.println("aqui");
+            socket.joinGroup(InetAddress.getByName(dir_mtc));
+            socket.receive(dgram);
+            System.out.println("aqui");
+            int cantjug = Integer.parseInt(paquete.deco_4(new String(dgram.getData()).trim(), 0).toString());
+            jugadores = new Jugador[cantjug];
+            for (int i = 0; i < jugadores.length; i++) {
+                String aux = paquete.deco_4(new String(dgram.getData()).trim(), i + 1).toString().trim();
+                String[] separar = aux.split(" ");
+                jugadores[i] = new Jugador(separar[0], Integer.parseInt(separar[1]));
+                System.out.println("cliente creado: " + jugadores[i].getNombre());
+            }
+            b = new byte[1024];
+            dgram = new DatagramPacket(b, b.length);
+            socket.receive(dgram);
+
+            System.out.println(new String(dgram.getData()));
+            for (int i = 0; i < jugadores.length; i++) {
+                String aux = paquete.deco_5(new String(dgram.getData()).trim(), i + 1).toString().trim();
+                String[] separar = aux.split(" ");
+                for (int j = 0; j < jugadores.length; j++) {
+                    if (jugadores[j].getId() == Integer.parseInt(separar[1])) {
+                        jugadores[j].setPuntaje(Integer.parseInt(separar[0]));
                     }
+                    System.out.println("cliente creado: " + jugadores[j].getNombre() + " puntaje: " + jugadores[j].getPuntaje());
                 }
-            } catch (IOException ex) {
-                Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
+
             }
 
-        }
-    }
+            String msgs = paquete.code_6("true");
+            out.write(msgs.getBytes());
+            System.out.println("envie " + msgs);
 
-    public class hiloMulticastClient implements Runnable {
-
-        public void run() {
-
-            try {
-                byte[] b = new byte[100];
-                DatagramPacket dgram = new DatagramPacket(b, b.length);
-                MulticastSocket socket = new MulticastSocket(puerto_mtc);
-                socket.joinGroup(InetAddress.getByName("235.1.1.1"));
-
-                while (true) {
-                    socket.receive(dgram); // Se bloquea hasta que llegue un datagrama
-                    System.err.println("Recivido " + dgram.getLength()
-                            + " bytes de " + dgram.getAddress() + " " + new String(dgram.getData()));
-
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
+                // Se bloquea hasta que llegue un datagrama
+        } catch (IOException ex) {
+            Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
+
+}
 
 }

@@ -1,5 +1,6 @@
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -17,8 +18,11 @@ import java.net.SocketException;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import sun.java2d.pipe.DrawImage;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -32,12 +36,13 @@ import javax.swing.JLabel;
 public class servidor extends JFrame implements Runnable {
 
     Json paquete;
-    int cont = 120;
+    int cont = 30;
     Socket[] clients = new Socket[4];
     int contClients;
     hilotcp hTCP[];
     JLabel cliente;
     DatagramSocket s;
+    DatagramPacket dgram;
     Thread hiloUDP;
     HiloControl controlsocket;
     ServerSocket server;
@@ -45,19 +50,30 @@ public class servidor extends JFrame implements Runnable {
     Thread hiloTCP;
     int puerto_udp = 20050;
     int puerto_tcp = 20060;
-    int puerto_mtc = 20060;
+    int puerto_mtc = 20070;
+    String dir_mtc = "235.1.1.1";
+    String dir_bro = "255.255.255.255";
 
     public servidor(JFrame x) {
 //-----------------jframe------------------------
 
         super("Blackjack-Server");
         setLayout(null);
+        
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(300, 500);
+        setSize(800, 600);
         setLocationRelativeTo(null);
         setVisible(true);
-
+        JLabel fondo=new JLabel();
+        fondo.setLocation(0,0);
+        fondo.setSize(getSize());
+        fondo.setVisible(true);
+        add(fondo);
+        ImageIcon fot = new ImageIcon((getClass().getResource("/masimagenes/fondo.jpg")));
+        ImageIcon icono = new ImageIcon(fot.getImage().getScaledInstance(fondo.getWidth(), fondo.getHeight(),java.awt.Image.SCALE_DEFAULT));
+        fondo.setIcon(icono);
+        
         hiloUDP = new Thread(this);
         hiloUDP.start();
         controlsocket = new HiloControl();
@@ -74,7 +90,7 @@ public class servidor extends JFrame implements Runnable {
 
             s = new DatagramSocket();
             System.out.println("Servidor Activo");
-            InetAddress ip = InetAddress.getByName("255.255.255.255");
+            InetAddress ip = InetAddress.getByName(dir_bro);
 
             while (true) {
                 paquete = new Json();
@@ -84,12 +100,24 @@ public class servidor extends JFrame implements Runnable {
                     Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 String message = paquete.code_1("server-javkell", cont, 4 - contClients);
+                System.out.println("tiempo "+cont);
                 msg = message.getBytes();
                 DatagramPacket paquete = new DatagramPacket(msg, msg.length, ip, puerto_udp);
                 //   System.out.println("mensaje a enviar" + message);
                 s.send(paquete);
                 // System.out.println("mensaje enviado");
                 cont--;
+                if (contClients == 4 ||cont==0) {
+                        new Juego();
+                        hiloTCP.stop();
+                        server.close();
+                        hiloUDP.stop();
+                        s.close();
+                        
+
+                        
+
+                    }
             }
         } catch (SocketException ex) {
             Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
@@ -131,12 +159,7 @@ public class servidor extends JFrame implements Runnable {
                     hTCP[contClients] = new hilotcp(clients[contClients]);
                     hTCP[contClients].run();
                     contClients++;
-                    if (contClients == 4) {
-                        hiloTCP.stop();
-                        server.close();
-                        hiloUDP.stop();
-                        s.close();
-                    }
+                    
 
                 } catch (IOException ex) {
                     Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
@@ -157,7 +180,6 @@ public class servidor extends JFrame implements Runnable {
             this.cliente = client;
         }
 
-        @Override
         public void run() {
             try {
                 DataOutputStream outToClient = new DataOutputStream(cliente.getOutputStream());
@@ -170,10 +192,9 @@ public class servidor extends JFrame implements Runnable {
                 System.out.println("recibido: " + nombre);
                 addcliente(nombre);
                 jugadores[contClients] = new Jugador(nombre, contClients);
-                mensaje = paquete.code_3(true, "239.237.55.33", contClients);
+                mensaje = paquete.code_3(true, dir_mtc, (int)Math.floor(Math.random()*(7376284-3242343)+3242343));
                 System.out.println(mensaje);
                 outToClient.write(mensaje.getBytes());
-
             } catch (IOException ex) {
                 Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -181,20 +202,38 @@ public class servidor extends JFrame implements Runnable {
         }
     }
 
-    public class hiloMulticastServer implements Runnable {
+    public class Juego implements Runnable {
+
+        public Juego() {
+            run();
+        }
+
         @Override
         public void run() {
             try {
                 MulticastSocket socket = new MulticastSocket();
-                byte[] b = "Martin Gigena".getBytes();
-                DatagramPacket dgram;
-                dgram = new DatagramPacket(b, b.length, InetAddress.getByName("235.1.1.1"), puerto_mtc);
-                System.err.println("Enviando " + b.length + " bytes a "
-                        + dgram.getAddress() + ':' + dgram.getPort());
-                while (true) {
-                    System.err.print(".");
-                    socket.send(dgram);
+                String aux = "";
+                paquete = new Json();
+                for (int i = 0; i < contClients; i++) {
+                    aux = aux + jugadores[i].getNombre() + " " + jugadores[i].getId() + " ";
                 }
+                System.out.println(paquete.code_4(aux.trim()));
+                byte[] b = paquete.code_4(aux.trim()).getBytes();
+                //-------------presentacion del juego--------------------------
+                dgram = new DatagramPacket(b, b.length, InetAddress.getByName(dir_mtc), puerto_mtc);
+                socket.send(dgram);
+                //-------------comienzo de ronda---------------------
+                aux = "";
+                paquete = new Json();
+                for (int i = 0; i < contClients; i++) {
+                    aux = aux + jugadores[i].getPuntaje() + " " + jugadores[i].getId() + " ";
+                }
+                System.out.println(paquete.code_5(aux.trim()));
+                b = paquete.code_5(aux.trim()).getBytes();
+                dgram = new DatagramPacket(b, b.length, InetAddress.getByName(dir_mtc), puerto_mtc);
+                socket.send(dgram);
+                
+                
             } catch (IOException ex) {
                 Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
             }

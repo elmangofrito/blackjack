@@ -10,7 +10,7 @@
  */
 public class Jugador 
 {
-    private int max = 10,puntaje;
+    private int max = 10,puntaje=0;
     
     private String nombre;
     private int id;
@@ -40,6 +40,14 @@ public class Jugador
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
     
     public void vaciarMano()
