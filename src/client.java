@@ -32,7 +32,9 @@ import sun.awt.windows.ThemeReader;
 public class client extends JFrame implements Runnable {
 
     Json paquete;
-    int puerto = 20050;
+    int puerto_udp = 20050;
+    int puerto_tcp = 20060;
+    int puerto_mtc = 20070;
     JComboBox ul;
     JButton aceptar;
     String host;
@@ -87,7 +89,7 @@ public class client extends JFrame implements Runnable {
             BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
             byte[] receiveData;
             DatagramPacket receivePacket;
-            clientSocket = new DatagramSocket(puerto);
+            clientSocket = new DatagramSocket(puerto_udp);
             Json x = new Json();
             String modifiedSentence;
 
@@ -138,7 +140,7 @@ public class client extends JFrame implements Runnable {
                 Jugador[] jugadores = new Jugador[3];;
                 Jugador yo = new Jugador(null, 0);
                 System.out.println(host);
-                Socket cliente = new Socket(host, 20060);
+                Socket cliente = new Socket(host, puerto_tcp);
                 System.out.println("conecto");
                 out = new DataOutputStream(cliente.getOutputStream());
                 in = new DataInputStream(cliente.getInputStream());

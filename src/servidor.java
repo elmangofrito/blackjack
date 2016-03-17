@@ -41,6 +41,8 @@ public class servidor extends JFrame implements Runnable {
     Thread hiloUDP;
     HiloControl controlsocket;
     ServerSocket server;
+    Jugador jugadores[] = new Jugador[4];
+    Thread hiloTCP;
 
     public servidor(JFrame x) {
 //-----------------jframe------------------------
@@ -56,7 +58,7 @@ public class servidor extends JFrame implements Runnable {
         hiloUDP = new Thread(this);
         hiloUDP.start();
         controlsocket = new HiloControl();
-        Thread hiloTCP = new Thread(controlsocket);
+        hiloTCP = new Thread(controlsocket);
         hiloTCP.start();
     }
 //--------------------------udp-----------------------------------------------    
@@ -79,7 +81,6 @@ public class servidor extends JFrame implements Runnable {
                     Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 String message = paquete.code_1("server-javkell", cont, 4 - contClients);
-                System.out.println(message);
                 msg = message.getBytes();
                 DatagramPacket paquete = new DatagramPacket(msg, msg.length, ip, PUERTO);
                 //   System.out.println("mensaje a enviar" + message);
@@ -127,6 +128,12 @@ public class servidor extends JFrame implements Runnable {
                     hTCP[contClients] = new hilotcp(clients[contClients]);
                     hTCP[contClients].run();
                     contClients++;
+                    if (contClients == 4) {
+                        hiloTCP.stop();
+                        server.close();
+                        hiloUDP.stop();
+                        s.close();
+                    }
 
                 } catch (IOException ex) {
                     Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
@@ -156,22 +163,39 @@ public class servidor extends JFrame implements Runnable {
                 byte[] cli = new byte[1024];
                 in.read(cli);
                 clientSentence = new String(cli);
-                System.out.println(clientSentence);
                 nombre = paquete.deco_2(clientSentence.trim(), 1).toString();
                 System.out.println("recibido: " + nombre);
                 addcliente(nombre);
+                jugadores[contClients] = new Jugador(nombre, contClients);
                 mensaje = paquete.code_3(true, "239.237.55.33", contClients);
                 System.out.println(mensaje);
                 outToClient.write(mensaje.getBytes());
-                mensaje = null;
-                paquete = new Json();
-                mensaje = paquete.code_4("javier 01 kelly 02 jesus 03");
-                outToClient.write(mensaje.getBytes());
-                
-                System.out.println(mensaje);
-                if (contClients == 3) {
-                    hiloUDP.stop();
-                    s.close();
+
+            } catch (IOException ex) {
+                Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+    }
+
+    public class hiloMulticastServer implements Runnable {
+
+        @Override
+        public void run() {
+
+            try {
+                MulticastSocket socket = new MulticastSocket();
+
+                byte[] b = "Martin Gigena".getBytes();
+                DatagramPacket dgram;
+
+                dgram = new DatagramPacket(b, b.length, InetAddress.getByName("235.1.1.1"), 4000);
+
+                System.err.println("Enviando " + b.length + " bytes a "
+                        + dgram.getAddress() + ':' + dgram.getPort());
+                while (true) {
+                    System.err.print(".");
+                    socket.send(dgram);
 
                 }
             } catch (IOException ex) {
@@ -179,38 +203,7 @@ public class servidor extends JFrame implements Runnable {
             }
 
         }
-    }
-    
-    
-    public class hiloMulticastServer implements Runnable{
 
-    @Override
-    public void run() {
-        
-
-        try {
-            MulticastSocket socket = new MulticastSocket();
-            
-            
-            byte[] b = "Martin Gigena".getBytes();
-            DatagramPacket dgram;
-            
-            dgram = new DatagramPacket(b, b.length,InetAddress.getByName("235.1.1.1"), 4000);
-            
-            System.err.println("Enviando " + b.length + " bytes a " +
-                    dgram.getAddress() + ':' + dgram.getPort());
-            while(true) {
-                System.err.print(".");
-                socket.send(dgram);
-               
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-       
     }
 
-}
-    
 }
