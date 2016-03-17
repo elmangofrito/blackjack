@@ -43,6 +43,9 @@ public class servidor extends JFrame implements Runnable {
     ServerSocket server;
     Jugador jugadores[] = new Jugador[4];
     Thread hiloTCP;
+    int puerto_udp = 20050;
+    int puerto_tcp = 20060;
+    int puerto_mtc = 20060;
 
     public servidor(JFrame x) {
 //-----------------jframe------------------------
@@ -66,7 +69,7 @@ public class servidor extends JFrame implements Runnable {
     @Override
     public void run() {
         try {
-            int PUERTO = 20050;
+
             byte msg[] = new byte[1024];
 
             s = new DatagramSocket();
@@ -82,7 +85,7 @@ public class servidor extends JFrame implements Runnable {
                 }
                 String message = paquete.code_1("server-javkell", cont, 4 - contClients);
                 msg = message.getBytes();
-                DatagramPacket paquete = new DatagramPacket(msg, msg.length, ip, PUERTO);
+                DatagramPacket paquete = new DatagramPacket(msg, msg.length, ip, puerto_udp);
                 //   System.out.println("mensaje a enviar" + message);
                 s.send(paquete);
                 // System.out.println("mensaje enviado");
@@ -112,7 +115,7 @@ public class servidor extends JFrame implements Runnable {
         public HiloControl() {
             hTCP = new hilotcp[4];
             try {
-                server = new ServerSocket(20060);
+                server = new ServerSocket(puerto_tcp);
             } catch (IOException ex) {
                 Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -179,31 +182,23 @@ public class servidor extends JFrame implements Runnable {
     }
 
     public class hiloMulticastServer implements Runnable {
-
         @Override
         public void run() {
-
             try {
                 MulticastSocket socket = new MulticastSocket();
-
                 byte[] b = "Martin Gigena".getBytes();
                 DatagramPacket dgram;
-
-                dgram = new DatagramPacket(b, b.length, InetAddress.getByName("235.1.1.1"), 4000);
-
+                dgram = new DatagramPacket(b, b.length, InetAddress.getByName("235.1.1.1"), puerto_mtc);
                 System.err.println("Enviando " + b.length + " bytes a "
                         + dgram.getAddress() + ':' + dgram.getPort());
                 while (true) {
                     System.err.print(".");
                     socket.send(dgram);
-
                 }
             } catch (IOException ex) {
                 Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
             }
-
         }
-
     }
 
 }

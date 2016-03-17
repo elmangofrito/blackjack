@@ -199,7 +199,7 @@ public class client extends JFrame implements Runnable {
             try {
                 byte[] b = new byte[100];
                 DatagramPacket dgram = new DatagramPacket(b, b.length);
-                MulticastSocket socket = new MulticastSocket(4000);
+                MulticastSocket socket = new MulticastSocket(puerto_mtc);
                 socket.joinGroup(InetAddress.getByName("235.1.1.1"));
 
                 while (true) {
