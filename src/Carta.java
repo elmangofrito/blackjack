@@ -27,6 +27,10 @@ public class Carta
             System.exit(1);
         }
     }
+
+    public Suit getMySuit() {
+        return mySuit;
+    }
     
     public int getNumber()
     {

@@ -9,8 +9,8 @@
  * @author Daniel
  */
 public enum Suit {
-    Trebol,
-    Diamante,
-    Pica,
-    Corazon  
+    t,
+    d,
+    p,
+    c  
 }

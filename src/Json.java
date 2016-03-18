@@ -12,7 +12,9 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 /**
  *
@@ -23,7 +25,7 @@ public class Json {
     JsonObject paquete = new JsonObject();
     String cadena_JSON = new String();
     JsonObject[] vec = new JsonObject[4];
-   
+    JSONArray x = new JSONArray();
 
     public int getCode(String recv) {
         JsonParser parser = new JsonParser();
@@ -123,102 +125,93 @@ public class Json {
     }
 
     public String code_4(Object jugadores) {
-        paquete = new JsonObject();
-        paquete.addProperty("codigo", 4);
+        JSONObject paquete4 = new JSONObject();
+        JSONObject auxjson = new JSONObject();
+        paquete4.put("codigo", 4);
+        x = new JSONArray();
         String aux = "";
         String[] separar = jugadores.toString().trim().split(" ");
-        
         for (int i = 0; i < separar.length / 2; i++) {
-            vec[i] = new JsonObject();
-            vec[i].addProperty("nombre", separar[i * 2]);
-            vec[i].addProperty("id_asignado", separar[(i * 2) + 1]);
-            aux = aux + vec[i].toString();
+            auxjson = new JSONObject();
+            auxjson.put("nombre", separar[i * 2]);
+            auxjson.put("id_asignado", separar[(i * 2) + 1]);
+            x.put(auxjson);
         }
-        paquete.addProperty("jugadores", aux);
+        paquete4.put("jugadores", x);
 
-        cadena_JSON = paquete.toString();
+        cadena_JSON = paquete4.toString();
         return cadena_JSON;
     }
 
     public Object deco_4(String JSON, int opcion) {
         JsonParser parser = new JsonParser();
         JsonElement Objeto = parser.parse(JSON);
+        JsonArray auxx = Objeto.getAsJsonObject().get("jugadores").getAsJsonArray();
+        System.out.println(auxx.get(0).getAsJsonObject().get("nombre").getAsString());
+        // una vez que llegue la matriz, puede marcar artículos como 
 
-        
-            String aux = Objeto.getAsJsonObject().get("jugadores").getAsString();
-            String[] separar = aux.split("}");
-            for (int i = 0; i < separar.length; i++) {
-                separar[i] = separar[i] + "}";
-            }
-            if(opcion==0)
-                return separar.length;
-            switch (opcion) {
+        if (opcion == 0) {
+            return auxx.size();
+        }
+        switch (opcion) {
             case 1:
-                Objeto=parser.parse(separar[0].trim());
-                return Objeto.getAsJsonObject().get("nombre").getAsString()+" "+Objeto.getAsJsonObject().get("id_asignado").getAsString();
+                return auxx.get(0).getAsJsonObject().get("nombre").getAsString() + " " + auxx.get(0).getAsJsonObject().get("id_asignado").getAsString();
             case 2:
-                Objeto=parser.parse(separar[1].trim());
-                return Objeto.getAsJsonObject().get("nombre").getAsString()+" "+Objeto.getAsJsonObject().get("id_asignado").getAsString();
+                return auxx.get(1).getAsJsonObject().get("nombre").getAsString() + " " + auxx.get(1).getAsJsonObject().get("id_asignado").getAsString();
             case 3:
-                Objeto=parser.parse(separar[2].trim());
-                return Objeto.getAsJsonObject().get("nombre").getAsString()+" "+Objeto.getAsJsonObject().get("id_asignado").getAsString();
+                return auxx.get(2).getAsJsonObject().get("nombre").getAsString() + " " + auxx.get(2).getAsJsonObject().get("id_asignado").getAsString();
             case 4:
-                Objeto=parser.parse(separar[3].trim());
-                return Objeto.getAsJsonObject().get("nombre").getAsString()+" "+Objeto.getAsJsonObject().get("id_asignado").getAsString();
-                
+                return auxx.get(3).getAsJsonObject().get("nombre").getAsString() + " " + auxx.get(3).getAsJsonObject().get("id_asignado").getAsString();
             default:
                 return null;
         }
-      
+
     }
-    
 
     public String code_5(Object jugador1) {
-        paquete = new JsonObject();
-        paquete.addProperty("codigo", 5);
+        JSONObject paquete5 = new JSONObject();
+        JSONObject auxjson = new JSONObject();
+        paquete5.put("codigo", 5);
+        x = new JSONArray();
         String aux = "";
         String[] separar = jugador1.toString().trim().split(" ");
-        for (int i = 0; i < separar.length / 2; i++) {
-            vec[i] = new JsonObject();
-            vec[i].addProperty("puntaje", separar[i * 2]);
-            vec[i].addProperty("id", separar[(i * 2) + 1]);
-            aux = aux + vec[i].toString();
-        }
-        paquete.addProperty("puntaje", aux);
 
-        cadena_JSON = paquete.toString();
+        for (int i = 0; i < separar.length / 2; i++) {
+            auxjson = new JSONObject();
+            auxjson.put("puntaje", separar[i * 2]);
+            auxjson.put("id", separar[(i * 2) + 1]);
+            x.put(auxjson);
+        }
+        
+        System.out.println(x.toString());
+        paquete5.put("puntaje", x);
+
+        cadena_JSON = paquete5.toString();
         return cadena_JSON;
     }
 
     public Object deco_5(String JSON, int opcion) {
         JsonParser parser = new JsonParser();
         JsonElement Objeto = parser.parse(JSON);
+        JsonArray auxx = Objeto.getAsJsonObject().get("puntaje").getAsJsonArray();
+        // una vez que llegue la matriz, puede marcar artículos como 
 
-        
-            String aux = Objeto.getAsJsonObject().get("puntaje").getAsString();
-            String[] separar = aux.split("}");
-            for (int i = 0; i < separar.length; i++) {
-                separar[i] = separar[i] + "}";
-            }
-            if(opcion==0)
-                return separar.length;
-            switch (opcion) {
+        if (opcion == 0) {
+            return Objeto.getAsJsonObject().get("codigo").getAsString();
+        }
+        switch (opcion) {
             case 1:
-                Objeto=parser.parse(separar[0].trim());
-                return Objeto.getAsJsonObject().get("puntaje").getAsString()+" "+Objeto.getAsJsonObject().get("id").getAsString();
+                return auxx.get(0).getAsJsonObject().get("puntaje").getAsString() + " " + auxx.get(0).getAsJsonObject().get("id").getAsString();
             case 2:
-                Objeto=parser.parse(separar[1].trim());
-                return Objeto.getAsJsonObject().get("puntaje").getAsString()+" "+Objeto.getAsJsonObject().get("id").getAsString();
+                return auxx.get(1).getAsJsonObject().get("puntaje").getAsString() + " " + auxx.get(1).getAsJsonObject().get("id").getAsString();
             case 3:
-                Objeto=parser.parse(separar[2].trim());
-                return Objeto.getAsJsonObject().get("puntaje").getAsString()+" "+Objeto.getAsJsonObject().get("id").getAsString();
+                return auxx.get(2).getAsJsonObject().get("puntaje").getAsString() + " " + auxx.get(2).getAsJsonObject().get("id").getAsString();
             case 4:
-                Objeto=parser.parse(separar[3].trim());
-                return Objeto.getAsJsonObject().get("puntaje").getAsString()+" "+Objeto.getAsJsonObject().get("id").getAsString();
-                
+                return auxx.get(3).getAsJsonObject().get("puntaje").getAsString() + " " + auxx.get(3).getAsJsonObject().get("id").getAsString();
             default:
                 return null;
         }
+
     }
 
     public String code_6(Object solbono) {

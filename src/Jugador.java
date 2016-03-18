@@ -1,3 +1,6 @@
+
+import java.net.Socket;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -18,6 +21,7 @@ public class Jugador
     private Carta[] mano = new Carta[max];
     
     private int numCartas;
+     Socket cliente;
     
     public Jugador(String aNombre,int id)
     {

@@ -36,7 +36,7 @@ import sun.java2d.pipe.DrawImage;
 public class servidor extends JFrame implements Runnable {
 
     Json paquete;
-    int cont = 30;
+    int cont = 10;
     Socket[] clients = new Socket[4];
     int contClients;
     hilotcp hTCP[];
@@ -46,34 +46,35 @@ public class servidor extends JFrame implements Runnable {
     Thread hiloUDP;
     HiloControl controlsocket;
     ServerSocket server;
-    Jugador jugadores[] = new Jugador[4];
+    Jugador jugadores[] = new Jugador[5];
     Thread hiloTCP;
     int puerto_udp = 20050;
     int puerto_tcp = 20060;
     int puerto_mtc = 20070;
     String dir_mtc = "235.1.1.1";
     String dir_bro = "255.255.255.255";
+    String mensaje,menString;
 
     public servidor(JFrame x) {
 //-----------------jframe------------------------
 
         super("Blackjack-Server");
         setLayout(null);
-        
+
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(800, 600);
         setLocationRelativeTo(null);
         setVisible(true);
-        JLabel fondo=new JLabel();
-        fondo.setLocation(0,0);
+        JLabel fondo = new JLabel();
+        fondo.setLocation(0, 0);
         fondo.setSize(getSize());
         fondo.setVisible(true);
         add(fondo);
         ImageIcon fot = new ImageIcon((getClass().getResource("/masimagenes/fondo.jpg")));
-        ImageIcon icono = new ImageIcon(fot.getImage().getScaledInstance(fondo.getWidth(), fondo.getHeight(),java.awt.Image.SCALE_DEFAULT));
+        ImageIcon icono = new ImageIcon(fot.getImage().getScaledInstance(fondo.getWidth(), fondo.getHeight(), java.awt.Image.SCALE_DEFAULT));
         fondo.setIcon(icono);
-        
+
         hiloUDP = new Thread(this);
         hiloUDP.start();
         controlsocket = new HiloControl();
@@ -95,29 +96,36 @@ public class servidor extends JFrame implements Runnable {
             while (true) {
                 paquete = new Json();
                 try {
+
                     sleep(1000);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 String message = paquete.code_1("server-javkell", cont, 4 - contClients);
-                System.out.println("tiempo "+cont);
+                System.out.println("tiempo " + cont);
                 msg = message.getBytes();
                 DatagramPacket paquete = new DatagramPacket(msg, msg.length, ip, puerto_udp);
                 //   System.out.println("mensaje a enviar" + message);
                 s.send(paquete);
                 // System.out.println("mensaje enviado");
                 cont--;
-                if (contClients == 4 ||cont==0) {
-                        new Juego();
-                        hiloTCP.stop();
-                        server.close();
-                        hiloUDP.stop();
-                        s.close();
-                        
+                if (contClients == 4 || cont == 0) {
+                    jugadores[contClients] = new Jugador("Servidor", 0001);
+                    contClients++;
+                    try {
 
-                        
-
+                        sleep(2000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                    new Juego();
+
+                    hiloUDP.stop();
+                    s.close();
+                    hiloTCP.stop();
+                    server.close();
+
+                }
             }
         } catch (SocketException ex) {
             Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
@@ -159,7 +167,6 @@ public class servidor extends JFrame implements Runnable {
                     hTCP[contClients] = new hilotcp(clients[contClients]);
                     hTCP[contClients].run();
                     contClients++;
-                    
 
                 } catch (IOException ex) {
                     Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
@@ -173,7 +180,7 @@ public class servidor extends JFrame implements Runnable {
 
         String clientSentence, nombre;
         String mensaje;
-        ServerSocket welcomeSocket;
+
         Socket cliente;
 
         private hilotcp(Socket client) {
@@ -191,16 +198,20 @@ public class servidor extends JFrame implements Runnable {
                 nombre = paquete.deco_2(clientSentence.trim(), 1).toString();
                 System.out.println("recibido: " + nombre);
                 addcliente(nombre);
-                jugadores[contClients] = new Jugador(nombre, contClients);
-                mensaje = paquete.code_3(true, dir_mtc, (int)Math.floor(Math.random()*(7376284-3242343)+3242343));
-                System.out.println(mensaje);
+                int asigid = (int) Math.floor(Math.random() * (7376284 - 3242343) + 3242343);
+                jugadores[contClients] = new Jugador(nombre, asigid);
+                jugadores[contClients].cliente = this.cliente;
+                mensaje = paquete.code_3(true, dir_mtc, asigid);
+                //       System.out.println(mensaje);
                 outToClient.write(mensaje.getBytes());
+
             } catch (IOException ex) {
                 Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         }
     }
+//---------------------multicast y juego--------------------------------
 
     public class Juego implements Runnable {
 
@@ -210,6 +221,7 @@ public class servidor extends JFrame implements Runnable {
 
         @Override
         public void run() {
+            Mazo mazojuego = new Mazo(3, true);
             try {
                 MulticastSocket socket = new MulticastSocket();
                 String aux = "";
@@ -217,7 +229,7 @@ public class servidor extends JFrame implements Runnable {
                 for (int i = 0; i < contClients; i++) {
                     aux = aux + jugadores[i].getNombre() + " " + jugadores[i].getId() + " ";
                 }
-                System.out.println(paquete.code_4(aux.trim()));
+                //     System.out.println(contClients+"  "+paquete.code_4(aux.trim()));
                 byte[] b = paquete.code_4(aux.trim()).getBytes();
                 //-------------presentacion del juego--------------------------
                 dgram = new DatagramPacket(b, b.length, InetAddress.getByName(dir_mtc), puerto_mtc);
@@ -234,6 +246,42 @@ public class servidor extends JFrame implements Runnable {
                 socket.send(dgram);
                 
                 
+                for (int i = 0; i < contClients - 1; i++) {
+                    DataOutputStream outToClient = new DataOutputStream(jugadores[i].cliente.getOutputStream());
+                    DataInputStream in = new DataInputStream(jugadores[i].cliente.getInputStream());
+                    //-----------carta 1---------------------------------
+                    Carta cartaaux = mazojuego.sacarCarta();
+                    mensaje=cartaaux.getNumber()+""+cartaaux.getMySuit();
+                    System.out.println(cartaaux.getMySuit()+" "+cartaaux.getNumber());
+                    menString=paquete.code_9(jugadores[i].getId(), mensaje.trim());
+                    outToClient.write(menString.getBytes());
+                   /* //-----------carta 2---------------------------------
+                    cartaaux = mazojuego.sacarCarta();
+                    mensaje=cartaaux.getNumber()+""+cartaaux.getMySuit();
+                    System.out.println(cartaaux.getMySuit()+" "+cartaaux.getNumber());
+                    menString=paquete.code_9(jugadores[i].getId(), mensaje.trim());
+                    outToClient.write(menString.getBytes());
+                    */
+                }
+                for (int i = 0; i < contClients -1; i++) {
+                    DataOutputStream outToClient = new DataOutputStream(jugadores[i].cliente.getOutputStream());
+                    DataInputStream in = new DataInputStream(jugadores[i].cliente.getInputStream());
+                    mensaje = paquete.code_7(jugadores[i].getId());
+                    System.out.println(mensaje);
+                    outToClient.write(mensaje.getBytes());
+                    b = new byte[2014];
+                    in.read(b);
+                    mensaje = null;
+                    mensaje = new String(b);
+
+                    if (paquete.deco_8(mensaje.trim(), 1).equals("true")) {
+                        System.out.println("pide");
+                        
+                        
+                    }
+                    
+                }
+
             } catch (IOException ex) {
                 Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
             }
