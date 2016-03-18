@@ -174,55 +174,68 @@ public class client extends JFrame implements Runnable {
         }
 
         public void run() {
-
+            boolean band = true;
             try {
-                byte[] b = new byte[1024];
-                DatagramPacket dgram = new DatagramPacket(b, b.length);
-                MulticastSocket socket = new MulticastSocket(puerto_mtc);
-                System.out.println("aqui");
-                socket.joinGroup(InetAddress.getByName(dir_mtc));
-                socket.receive(dgram);
-                System.out.println(new String(dgram.getData()));
-                int cantjug = Integer.parseInt(paquete.deco_4(new String(dgram.getData()).trim(), 0).toString());
-                jugadores = new Jugador[cantjug];
-                for (int i = 0; i < jugadores.length; i++) {
-                    String aux = paquete.deco_4(new String(dgram.getData()).trim(), i + 1).toString().trim();
-                    String[] separar = aux.split(" ");
-                    jugadores[i] = new Jugador(separar[0], Integer.parseInt(separar[1]));
-                    System.out.println("cliente creado: " + jugadores[i].getNombre());
-                }
-                b = new byte[1024];
-                dgram = new DatagramPacket(b, b.length);
-                socket.receive(dgram);
-
-                System.out.println(new String(dgram.getData()));
-                for (int i = 0; i < jugadores.length; i++) {
-                    String aux = paquete.deco_5(new String(dgram.getData()).trim(), i + 1).toString().trim();
-                    String[] separar = aux.split(" ");
-                    for (int j = 0; j < jugadores.length; j++) {
-                        if (jugadores[j].getId() == Integer.parseInt(separar[1])) {
-                            jugadores[j].setPuntaje(Integer.parseInt(separar[0]));
+                while (true) {
+                    if (band) {
+                        byte[] b = new byte[1024];
+                        DatagramPacket dgram = new DatagramPacket(b, b.length);
+                        MulticastSocket socket = new MulticastSocket(puerto_mtc);
+                        System.out.println("aqui");
+                        socket.joinGroup(InetAddress.getByName(dir_mtc));
+                        socket.receive(dgram);
+                        System.out.println(new String(dgram.getData()));
+                        int cantjug = Integer.parseInt(paquete.deco_4(new String(dgram.getData()).trim(), 0).toString());
+                        jugadores = new Jugador[cantjug];
+                        for (int i = 0; i < jugadores.length; i++) {
+                            String aux = paquete.deco_4(new String(dgram.getData()).trim(), i + 1).toString().trim();
+                            String[] separar = aux.split(" ");
+                            jugadores[i] = new Jugador(separar[0], Integer.parseInt(separar[1]));
+                            System.out.println("cliente creado: " + jugadores[i].getNombre());
                         }
-                        // System.out.println("cliente creado: " + jugadores[j].getNombre() + " puntaje: " + jugadores[j].getPuntaje());
-                    }
-                }
-                in = new DataInputStream(cliente.getInputStream());
-                in.read(cli);
-                msgs = new String(cli);
-                
-                System.out.println(paquete.deco_9(msgs.trim(), 2));
-                
-                in = new DataInputStream(cliente.getInputStream());
-                in.read(cli);
-                msgs = new String(cli);
-                System.out.println(yo.getNombre() + " con id " + yo.getId());
-                if (yo.getId() == Integer.parseInt((String) paquete.deco_7(msgs.trim(), 1))) {
-                    System.out.println(msgs);
-                    msgs = paquete.code_8("true");
-                    out.write(msgs.getBytes());
-                }
+                        b = new byte[1024];
+                        dgram = new DatagramPacket(b, b.length);
+                        socket.receive(dgram);
 
-                // Se bloquea hasta que llegue un datagrama
+                        System.out.println(new String(dgram.getData()));
+                        for (int i = 0; i < jugadores.length; i++) {
+                            String aux = paquete.deco_5(new String(dgram.getData()).trim(), i + 1).toString().trim();
+                            String[] separar = aux.split(" ");
+                            for (int j = 0; j < jugadores.length; j++) {
+                                if (jugadores[j].getId() == Integer.parseInt(separar[1])) {
+                                    jugadores[j].setPuntaje(Integer.parseInt(separar[0]));
+                                }
+                                // System.out.println("cliente creado: " + jugadores[j].getNombre() + " puntaje: " + jugadores[j].getPuntaje());
+                            }
+                        }
+                        //------------carta1
+                        dgram = new DatagramPacket(b, b.length);
+                        socket.receive(dgram);
+                        msgs = new String(dgram.getData());
+                        System.out.println(paquete.deco_9(msgs.trim(), 2));
+                        
+                        //------------carta2
+                        dgram = new DatagramPacket(b, b.length);
+                        socket.receive(dgram);
+                        msgs = new String(dgram.getData());
+                        System.out.println(paquete.deco_9(msgs.trim(), 2));
+                        band = false;
+                    } else {
+                        in = new DataInputStream(cliente.getInputStream());
+                        in.read(cli);
+                        msgs = new String(cli);
+                        System.out.println(yo.getNombre() + " con id " + yo.getId());
+                        if (yo.getId() == Integer.parseInt((String) paquete.deco_7(msgs.trim(), 1))) {
+                            System.out.println(msgs);
+                            msgs = paquete.code_8("true");
+                            out.write(msgs.getBytes());
+                            in.read(cli);
+                            msgs = new String(cli);
+                            System.out.println(paquete.deco_9(msgs.trim(), 2));
+                        }
+                    }
+                    // Se bloquea hasta que llegue un datagrama
+                }
             } catch (IOException ex) {
                 Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
             }

@@ -255,13 +255,17 @@ public class servidor extends JFrame implements Runnable {
                     System.out.println(cartaaux.getMySuit()+" "+cartaaux.getNumber());
                     menString=paquete.code_9(jugadores[i].getId(), mensaje.trim());
                     outToClient.write(menString.getBytes());
-                   /* //-----------carta 2---------------------------------
-                    cartaaux = mazojuego.sacarCarta();
+                }
+                for (int i = 0; i < contClients - 1; i++) {
+                    DataOutputStream outToClient = new DataOutputStream(jugadores[i].cliente.getOutputStream());
+                    DataInputStream in = new DataInputStream(jugadores[i].cliente.getInputStream());
+                    //-----------carta 2---------------------------------
+                    Carta cartaaux = mazojuego.sacarCarta();
                     mensaje=cartaaux.getNumber()+""+cartaaux.getMySuit();
                     System.out.println(cartaaux.getMySuit()+" "+cartaaux.getNumber());
                     menString=paquete.code_9(jugadores[i].getId(), mensaje.trim());
                     outToClient.write(menString.getBytes());
-                    */
+                    
                 }
                 for (int i = 0; i < contClients -1; i++) {
                     DataOutputStream outToClient = new DataOutputStream(jugadores[i].cliente.getOutputStream());
@@ -276,10 +280,7 @@ public class servidor extends JFrame implements Runnable {
 
                     if (paquete.deco_8(mensaje.trim(), 1).equals("true")) {
                         System.out.println("pide");
-                        
-                        
                     }
-                    
                 }
 
             } catch (IOException ex) {
