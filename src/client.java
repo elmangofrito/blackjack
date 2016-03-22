@@ -176,12 +176,13 @@ public class client extends JFrame implements Runnable {
         public void run() {
             boolean band = true;
             try {
+                byte[] b = new byte[1024];
+                DatagramPacket dgram = new DatagramPacket(b, b.length);
+                MulticastSocket socket = new MulticastSocket(puerto_mtc);
+
                 while (true) {
                     if (band) {
-                        byte[] b = new byte[1024];
-                        DatagramPacket dgram = new DatagramPacket(b, b.length);
-                        MulticastSocket socket = new MulticastSocket(puerto_mtc);
-                        System.out.println("aqui");
+                        band = false;
                         socket.joinGroup(InetAddress.getByName(dir_mtc));
                         socket.receive(dgram);
                         System.out.println(new String(dgram.getData()));
@@ -208,32 +209,23 @@ public class client extends JFrame implements Runnable {
                                 // System.out.println("cliente creado: " + jugadores[j].getNombre() + " puntaje: " + jugadores[j].getPuntaje());
                             }
                         }
-                        //------------carta1
-                        dgram = new DatagramPacket(b, b.length);
-                        socket.receive(dgram);
-                        msgs = new String(dgram.getData());
-                        System.out.println(paquete.deco_9(msgs.trim(), 2));
-                        
-                        //------------carta2
-                        dgram = new DatagramPacket(b, b.length);
-                        socket.receive(dgram);
-                        msgs = new String(dgram.getData());
-                        System.out.println(paquete.deco_9(msgs.trim(), 2));
-                        band = false;
+
                     } else {
-                        in = new DataInputStream(cliente.getInputStream());
-                        in.read(cli);
-                        msgs = new String(cli);
-                        System.out.println(yo.getNombre() + " con id " + yo.getId());
-                        if (yo.getId() == Integer.parseInt((String) paquete.deco_7(msgs.trim(), 1))) {
+                        b = new byte[1024];
+                        dgram = new DatagramPacket(b, b.length);
+                        socket.receive(dgram);
+                        msgs = new String(dgram.getData());
+                        System.out.println(msgs);
+                        System.out.println(paquete.deco_9(msgs.trim(), 2));
+              /*          if (yo.getId() == Integer.parseInt((String) paquete.deco_7(msgs.trim(), 1))) {
                             System.out.println(msgs);
                             msgs = paquete.code_8("true");
                             out.write(msgs.getBytes());
                             in.read(cli);
                             msgs = new String(cli);
-                            System.out.println(paquete.deco_9(msgs.trim(), 2));
+                            System.out.println(msgs);
                         }
-                    }
+                */    }
                     // Se bloquea hasta que llegue un datagrama
                 }
             } catch (IOException ex) {

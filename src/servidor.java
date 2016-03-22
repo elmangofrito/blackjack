@@ -53,7 +53,7 @@ public class servidor extends JFrame implements Runnable {
     int puerto_mtc = 20070;
     String dir_mtc = "235.1.1.1";
     String dir_bro = "255.255.255.255";
-    String mensaje,menString;
+    String mensaje, menString;
 
     public servidor(JFrame x) {
 //-----------------jframe------------------------
@@ -244,30 +244,32 @@ public class servidor extends JFrame implements Runnable {
                 b = paquete.code_5(aux.trim()).getBytes();
                 dgram = new DatagramPacket(b, b.length, InetAddress.getByName(dir_mtc), puerto_mtc);
                 socket.send(dgram);
-                
-                
+
                 for (int i = 0; i < contClients - 1; i++) {
-                    DataOutputStream outToClient = new DataOutputStream(jugadores[i].cliente.getOutputStream());
-                    DataInputStream in = new DataInputStream(jugadores[i].cliente.getInputStream());
                     //-----------carta 1---------------------------------
                     Carta cartaaux = mazojuego.sacarCarta();
-                    mensaje=cartaaux.getNumber()+""+cartaaux.getMySuit();
-                    System.out.println(cartaaux.getMySuit()+" "+cartaaux.getNumber());
-                    menString=paquete.code_9(jugadores[i].getId(), mensaje.trim());
-                    outToClient.write(menString.getBytes());
+                    mensaje = cartaaux.getNumber() + "" + cartaaux.getMySuit();
+                    System.out.println(cartaaux.getMySuit() + " " + cartaaux.getNumber());
+                    menString = paquete.code_9(jugadores[i].getId(), mensaje.trim());
+                    b = menString.getBytes();
+                    dgram = new DatagramPacket(b, b.length, InetAddress.getByName(dir_mtc), puerto_mtc);
+                    socket.send(dgram);
+
                 }
                 for (int i = 0; i < contClients - 1; i++) {
                     DataOutputStream outToClient = new DataOutputStream(jugadores[i].cliente.getOutputStream());
                     DataInputStream in = new DataInputStream(jugadores[i].cliente.getInputStream());
                     //-----------carta 2---------------------------------
                     Carta cartaaux = mazojuego.sacarCarta();
-                    mensaje=cartaaux.getNumber()+""+cartaaux.getMySuit();
-                    System.out.println(cartaaux.getMySuit()+" "+cartaaux.getNumber());
-                    menString=paquete.code_9(jugadores[i].getId(), mensaje.trim());
-                    outToClient.write(menString.getBytes());
-                    
+                    mensaje = cartaaux.getNumber() + "" + cartaaux.getMySuit();
+                    System.out.println(cartaaux.getMySuit() + " " + cartaaux.getNumber());
+                    menString = paquete.code_9(jugadores[i].getId(), mensaje.trim());
+                    b = menString.getBytes();
+                    dgram = new DatagramPacket(b, b.length, InetAddress.getByName(dir_mtc), puerto_mtc);
+                    socket.send(dgram);
+
                 }
-                for (int i = 0; i < contClients -1; i++) {
+            /*    for (int i = 0; i < contClients - 1; i++) {
                     DataOutputStream outToClient = new DataOutputStream(jugadores[i].cliente.getOutputStream());
                     DataInputStream in = new DataInputStream(jugadores[i].cliente.getInputStream());
                     mensaje = paquete.code_7(jugadores[i].getId());
@@ -283,6 +285,8 @@ public class servidor extends JFrame implements Runnable {
                     }
                 }
 
+                    
+                    */
             } catch (IOException ex) {
                 Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
             }
