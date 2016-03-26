@@ -16,10 +16,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Date;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import sun.java2d.pipe.DrawImage;
@@ -36,7 +38,7 @@ import sun.java2d.pipe.DrawImage;
 public class servidor extends JFrame implements Runnable {
 
     Json paquete;
-    int cont = 10;
+    int cont = 5;
     Socket[] clients = new Socket[4];
     int contClients;
     hilotcp hTCP[];
@@ -54,7 +56,7 @@ public class servidor extends JFrame implements Runnable {
     String dir_mtc = "235.1.1.1";
     String dir_bro = "255.255.255.255";
     String mensaje, menString;
-
+    JLabel fondo;
     public servidor(JFrame x) {
 //-----------------jframe------------------------
 
@@ -66,7 +68,7 @@ public class servidor extends JFrame implements Runnable {
         setSize(800, 600);
         setLocationRelativeTo(null);
         setVisible(true);
-        JLabel fondo = new JLabel();
+     /*   fondo = new JLabel();
         fondo.setLocation(0, 0);
         fondo.setSize(getSize());
         fondo.setVisible(true);
@@ -74,7 +76,7 @@ public class servidor extends JFrame implements Runnable {
         ImageIcon fot = new ImageIcon((getClass().getResource("/masimagenes/fondo.jpg")));
         ImageIcon icono = new ImageIcon(fot.getImage().getScaledInstance(fondo.getWidth(), fondo.getHeight(), java.awt.Image.SCALE_DEFAULT));
         fondo.setIcon(icono);
-
+*/
         hiloUDP = new Thread(this);
         hiloUDP.start();
         controlsocket = new HiloControl();
@@ -136,11 +138,23 @@ public class servidor extends JFrame implements Runnable {
     }
 
     public void addcliente(String nombre) {
-        JLabel cliente = new JLabel(nombre);
-        cliente.setBounds(50, 50 * (contClients + 1), 100, 20);
-        add(cliente);
-        cliente.setVisible(true);
-        System.out.println("add hecho");
+        JButton cliButton=new JButton();
+        cliButton.setSize(400, 100);
+        cliButton.setLocation(100, (contClients+1)*100);
+        add(cliButton);
+        JLabel imgcliente=new JLabel();
+        imgcliente.setBounds(150,40, 50 , 50);
+        ImageIcon fot = new ImageIcon((getClass().getResource("/masimagenes/"+(contClients+1)+".png")));
+        ImageIcon icono = new ImageIcon(fot.getImage().getScaledInstance(imgcliente.getWidth(), imgcliente.getHeight(), java.awt.Image.SCALE_DEFAULT));
+        imgcliente.setIcon(icono);
+        cliButton.add(imgcliente);
+        cliButton.setText(nombre);
+        
+  /*      JLabel labelcliente = new JLabel(nombre);
+        labelcliente.setBounds(220, 50, 100, 20);
+        cliButton.add(labelcliente);
+        labelcliente.setVisible(true);
+    */    System.out.println("add hecho");
         repaint();
 
     }
@@ -161,7 +175,7 @@ public class servidor extends JFrame implements Runnable {
         public void run() {
             while (true) {
                 try {
-
+                    
                     clients[contClients] = server.accept();
                     System.out.println("Se conecto alguien");
                     hTCP[contClients] = new hilotcp(clients[contClients]);
@@ -244,25 +258,28 @@ public class servidor extends JFrame implements Runnable {
                 b = paquete.code_5(aux.trim()).getBytes();
                 dgram = new DatagramPacket(b, b.length, InetAddress.getByName(dir_mtc), puerto_mtc);
                 socket.send(dgram);
-
+                Carta cartaaux;
                 for (int i = 0; i < contClients - 1; i++) {
                     //-----------carta 1---------------------------------
-                    Carta cartaaux = mazojuego.sacarCarta();
-                    mensaje = cartaaux.getNumber() + "" + cartaaux.getMySuit();
-                    System.out.println(cartaaux.getMySuit() + " " + cartaaux.getNumber());
+                    cartaaux = mazojuego.sacarCarta();
+                    System.out.println(cartaaux);
+                    mensaje = cartaaux.getSNumber() + "" + cartaaux.getMySuit();
+                    System.out.println(mensaje);
                     menString = paquete.code_9(jugadores[i].getId(), mensaje.trim());
                     b = menString.getBytes();
                     dgram = new DatagramPacket(b, b.length, InetAddress.getByName(dir_mtc), puerto_mtc);
                     socket.send(dgram);
 
                 }
+                
                 for (int i = 0; i < contClients - 1; i++) {
                     DataOutputStream outToClient = new DataOutputStream(jugadores[i].cliente.getOutputStream());
                     DataInputStream in = new DataInputStream(jugadores[i].cliente.getInputStream());
                     //-----------carta 2---------------------------------
-                    Carta cartaaux = mazojuego.sacarCarta();
-                    mensaje = cartaaux.getNumber() + "" + cartaaux.getMySuit();
-                    System.out.println(cartaaux.getMySuit() + " " + cartaaux.getNumber());
+                    cartaaux = mazojuego.sacarCarta();
+                    mensaje = cartaaux.getSNumber() + "" + cartaaux.getMySuit();
+                    System.out.println(mensaje);
+                   
                     menString = paquete.code_9(jugadores[i].getId(), mensaje.trim());
                     b = menString.getBytes();
                     dgram = new DatagramPacket(b, b.length, InetAddress.getByName(dir_mtc), puerto_mtc);

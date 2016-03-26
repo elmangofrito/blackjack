@@ -1,5 +1,6 @@
 
 import java.net.Socket;
+import javax.swing.JLabel;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -14,7 +15,7 @@ import java.net.Socket;
 public class Jugador 
 {
     private int max = 10,puntaje=0;
-    
+    JLabel labelcliente ;
     private String nombre;
     private int id;
     

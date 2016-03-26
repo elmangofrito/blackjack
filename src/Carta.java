@@ -12,19 +12,34 @@ public class Carta
 {
     
     private Suit mySuit; // El palo de la carta
-    private int myNumber; // El numero de la carta: As = 1, J-K = 11-13
-     
-    public Carta(Suit aSuit, int aNumber)
+    private String myNumber; // El numero de la carta: As = 1, J-K = 11-13
+    private String[] Mynumber={"a","2","3","4","5","6","7","8","9","10","j","q","k"};
+
+    public String getMynumber(int n) {
+        return this.Mynumber[n];
+    }
+
+    public Carta() {
+        
+    }
+    public void carta(){}
+    public Carta(Suit aSuit, String Rnumber)
     {
         this.mySuit = aSuit;
-        
-        if(aNumber >= 1 && aNumber <= 13)
-        {
-            this.myNumber = aNumber;
-        }else
-        {
-            System.err.println(aNumber + " no es un numero valido");
-            System.exit(1);
+        boolean band=true;
+        int i=0;
+        while(band && i<13){
+            if(Rnumber==Mynumber[i]){
+                band=false;
+            }
+            i++;
+        }
+        if(band){
+            System.err.println(Rnumber+"no es una carta valida");
+        }
+        else{
+            
+            this.myNumber=Rnumber;
         }
     }
 
@@ -34,7 +49,19 @@ public class Carta
     
     public int getNumber()
     {
-        return myNumber;
+        
+          
+        int i=0;
+        do {
+            if(myNumber==Mynumber[i]) {
+            return i+1;
+            }
+            i++;
+        }while (i<13);
+        return 0;
+    }
+    public Object getSNumber(){
+        return this.myNumber;
     }
         
 }

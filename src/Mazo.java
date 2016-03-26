@@ -29,9 +29,10 @@ public class Mazo
         {
             for (int s = 0; s < 4; s++) // Suit
             {
-                for (int n = 1; n <= 13; n++) // Numero
+                for (int n = 0; n <13; n++) // Numero
                 {
-                    this.myCartas[c] = new Carta(Suit.values()[s], n); // Nueva carta
+                    this.myCartas[c] = new Carta();
+                    this.myCartas[c] = new Carta(Suit.values()[s], this.myCartas[c].getMynumber(n)); // Nueva carta
                     c++;
                 }
             }

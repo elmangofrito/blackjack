@@ -47,6 +47,7 @@ public class client extends JFrame implements Runnable {
     Jugador jugadores[];
     Socket cliente;
     String msgs;
+    int ID,iID;
     Jugador yo = new Jugador(null, 0);
     //-------------------------------------------------------------------
 
@@ -150,12 +151,12 @@ public class client extends JFrame implements Runnable {
                 out = new DataOutputStream(cliente.getOutputStream());
                 in = new DataInputStream(cliente.getInputStream());
                 System.out.println("Se conecto.");
-                String msgs = paquete.code_2("Cliente-ja");
+                String msgs = paquete.code_2("Cliente-jagg");
                 out.write(msgs.getBytes());
                 System.out.println("envie " + msgs);
                 in.read(cli);
                 msgs = new String(cli);
-                yo = new Jugador("Cliente-javkell", Integer.parseInt(paquete.deco_3(msgs.trim(), 3).toString()));
+                ID = Integer.parseInt(paquete.deco_3(msgs.trim(), 3).toString());
                 dir_mtc = paquete.deco_3(msgs.trim(), 2).toString();
                 cli = new byte[1024];
                 new juego_cliente();
@@ -184,29 +185,33 @@ public class client extends JFrame implements Runnable {
                     if (band) {
                         band = false;
                         socket.joinGroup(InetAddress.getByName(dir_mtc));
+                        //recibir mensaje de presentacion
                         socket.receive(dgram);
                         System.out.println(new String(dgram.getData()));
+                        //guardando la cantidad de jugadores que se envio en el paq 4  
                         int cantjug = Integer.parseInt(paquete.deco_4(new String(dgram.getData()).trim(), 0).toString());
                         jugadores = new Jugador[cantjug];
                         for (int i = 0; i < jugadores.length; i++) {
                             String aux = paquete.deco_4(new String(dgram.getData()).trim(), i + 1).toString().trim();
                             String[] separar = aux.split(" ");
                             jugadores[i] = new Jugador(separar[0], Integer.parseInt(separar[1]));
+                            if(Integer.parseInt(separar[1])==ID){
+                                iID=i;
+                            }
                             System.out.println("cliente creado: " + jugadores[i].getNombre());
                         }
                         b = new byte[1024];
                         dgram = new DatagramPacket(b, b.length);
                         socket.receive(dgram);
 
-                        System.out.println(new String(dgram.getData()));
                         for (int i = 0; i < jugadores.length; i++) {
                             String aux = paquete.deco_5(new String(dgram.getData()).trim(), i + 1).toString().trim();
                             String[] separar = aux.split(" ");
                             for (int j = 0; j < jugadores.length; j++) {
                                 if (jugadores[j].getId() == Integer.parseInt(separar[1])) {
                                     jugadores[j].setPuntaje(Integer.parseInt(separar[0]));
+                                    
                                 }
-                                // System.out.println("cliente creado: " + jugadores[j].getNombre() + " puntaje: " + jugadores[j].getPuntaje());
                             }
                         }
 
@@ -215,18 +220,21 @@ public class client extends JFrame implements Runnable {
                         dgram = new DatagramPacket(b, b.length);
                         socket.receive(dgram);
                         msgs = new String(dgram.getData());
-                        System.out.println(msgs);
-                        System.out.println(paquete.deco_9(msgs.trim(), 2));
-              /*          if (yo.getId() == Integer.parseInt((String) paquete.deco_7(msgs.trim(), 1))) {
-                            System.out.println(msgs);
-                            msgs = paquete.code_8("true");
-                            out.write(msgs.getBytes());
-                            in.read(cli);
-                            msgs = new String(cli);
-                            System.out.println(msgs);
+
+                        switch (paquete.getCode(msgs.trim())) {
+                            case 9:
+                                if (Integer.parseInt((String) paquete.deco_9(msgs.trim(), 1)) == ID) {
+                                    System.out.println(paquete.deco_9(msgs.trim(), 1) + " " + paquete.deco_9(msgs.trim(), 2));
+                        /*            Carta aux=new Carta(,paquete.deco_9(msgs.trim(), 2).toString().charAt(1));
+                                    jugadores[iID].addCarta((Carta)paquete.deco_9(msgs.trim(), 2));
+                          */      }
+                                break;
+                            default:
+                                throw new AssertionError();
                         }
-                */    }
-                    // Se bloquea hasta que llegue un datagrama
+
+                    }
+
                 }
             } catch (IOException ex) {
                 Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);

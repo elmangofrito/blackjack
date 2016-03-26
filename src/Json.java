@@ -162,6 +162,8 @@ public class Json {
                 return auxx.get(2).getAsJsonObject().get("nombre").getAsString() + " " + auxx.get(2).getAsJsonObject().get("id_asignado").getAsString();
             case 4:
                 return auxx.get(3).getAsJsonObject().get("nombre").getAsString() + " " + auxx.get(3).getAsJsonObject().get("id_asignado").getAsString();
+            case 5:
+                return auxx.get(4).getAsJsonObject().get("nombre").getAsString() + " " + auxx.get(4).getAsJsonObject().get("id_asignado").getAsString();
             default:
                 return null;
         }
@@ -208,6 +210,8 @@ public class Json {
                 return auxx.get(2).getAsJsonObject().get("puntaje").getAsString() + " " + auxx.get(2).getAsJsonObject().get("id").getAsString();
             case 4:
                 return auxx.get(3).getAsJsonObject().get("puntaje").getAsString() + " " + auxx.get(3).getAsJsonObject().get("id").getAsString();
+            case 5:
+                return auxx.get(4).getAsJsonObject().get("puntaje").getAsString() + " " + auxx.get(4).getAsJsonObject().get("id").getAsString();
             default:
                 return null;
         }
