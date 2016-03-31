@@ -33,7 +33,12 @@ public class Json {
 
         return Objeto.getAsJsonObject().get("codigo").getAsInt();
     }
+    public int getID(String recv) {
+        JsonParser parser = new JsonParser();
+        com.google.gson.JsonElement Objeto = parser.parse(recv);
 
+        return Objeto.getAsJsonObject().get("id").getAsInt();
+    }
     public String code_1(Object nombre, Object tiempo, Object espacios) {
         paquete = new JsonObject();
         paquete.addProperty("codigo", 1);
@@ -279,7 +284,7 @@ public class Json {
             return Objeto.getAsJsonObject().get("codigo").getAsInt();
         }
         if (opcion == 1) {
-            return Objeto.getAsJsonObject().get("jugar").getAsString();
+            return Objeto.getAsJsonObject().get("jugar").getAsBoolean();
         } else {
             System.err.println("error");
         }

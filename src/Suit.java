@@ -8,6 +8,7 @@
  *
  * @author Daniel
  */
+
 public enum Suit {
     t,
     d,

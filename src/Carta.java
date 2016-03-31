@@ -29,16 +29,15 @@ public class Carta
         boolean band=true;
         int i=0;
         while(band && i<13){
-            if(Rnumber==Mynumber[i]){
+            if(Mynumber[i].equals(Rnumber)){
                 band=false;
             }
             i++;
         }
         if(band){
-            System.err.println(Rnumber+"no es una carta valida");
+            System.err.println(Rnumber +"no es una carta valida");
         }
         else{
-            
             this.myNumber=Rnumber;
         }
     }
@@ -53,7 +52,7 @@ public class Carta
           
         int i=0;
         do {
-            if(myNumber==Mynumber[i]) {
+            if(Mynumber[i].equals(myNumber)) {
             return i+1;
             }
             i++;

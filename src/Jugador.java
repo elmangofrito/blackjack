@@ -14,15 +14,25 @@ import javax.swing.JLabel;
  */
 public class Jugador 
 {
-    private int max = 10,puntaje=0;
+    private int max = 20,puntaje=0;
     JLabel labelcliente ;
+    JLabel Mano;
+    JLabel puntos;
     private String nombre;
     private int id;
     
     private Carta[] mano = new Carta[max];
     
-    private int numCartas;
+    private int numCartas=0;
      Socket cliente;
+
+    public Carta[] getMano() {
+        return mano;
+    }
+     
+    public int getNumCartas() {
+        return numCartas;
+    }
     
     public Jugador(String aNombre,int id)
     {
@@ -81,7 +91,6 @@ public class Jugador
         for (int c = 0; c < this.numCartas; c++)
         {
             cartaNum = this.mano[c].getNumber();
-            
             if (cartaNum == 1)
             {
                 numAses++;
