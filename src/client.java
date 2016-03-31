@@ -67,12 +67,14 @@ public class client extends JFrame implements Runnable {
         aceptar.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                hilo.stop();
                 clientSocket.close();
-                System.out.println(host);
                 hilotcp obj = new hilotcp();
                 Thread hiThread = new Thread(obj);
                 hiThread.start();
+                
+                
+                System.out.println(host);
+                
             }
         });
 
@@ -101,7 +103,7 @@ public class client extends JFrame implements Runnable {
     }
 
     public void colocarcarta(String suit, int i) {
-        
+
         switch (suit) {
             case "c":
                 jugadores[i].labelcliente = new JLabel(new ImageIcon(getClass().getResource("/imagens/Corazon/" + jugadores[i].getMano()[jugadores[i].getNumCartas() - 1].getSNumber().toString().trim() + ".png")));
@@ -122,28 +124,28 @@ public class client extends JFrame implements Runnable {
         switch (i) {
             case 0:
                 jugadores[i].labelcliente.setLocation(70 - (15 * jugadores[iID].getNumCartas()), 300);
-                jugadores[i].Mano.setLocation(70  , 400);
+                jugadores[i].Mano.setLocation(70, 400);
                 jugadores[i].puntos.setLocation(70, 410);
                 break;
             case 1:
                 jugadores[i].labelcliente.setLocation(250 - (15 * jugadores[iID].getNumCartas()), 450);
-                jugadores[i].Mano.setLocation(250  , 550);
+                jugadores[i].Mano.setLocation(250, 550);
                 jugadores[i].puntos.setLocation(250, 560);
                 break;
             case 2:
                 jugadores[i].labelcliente.setLocation(450 - (15 * jugadores[iID].getNumCartas()), 450);
-                jugadores[i].Mano.setLocation(450 , 550);
+                jugadores[i].Mano.setLocation(450, 550);
                 jugadores[i].puntos.setLocation(450, 560);
                 break;
             case 3:
                 jugadores[i].labelcliente.setLocation(660 - (15 * jugadores[iID].getNumCartas()), 300);
-                jugadores[i].Mano.setLocation(660  , 400);
+                jugadores[i].Mano.setLocation(660, 400);
                 jugadores[i].puntos.setLocation(660, 410);
                 break;
             default:
                 throw new AssertionError();
         }
-        
+
         jugadores[i].labelcliente.setSize(70, 90);
         jugadores[i].Mano.setSize(60, 15);
         jugadores[i].puntos.setSize(60, 15);
@@ -157,8 +159,7 @@ public class client extends JFrame implements Runnable {
         fondo.add(jugadores[i].Mano);
         fondo.add(jugadores[i].puntos);
         fondo.add(jugadores[i].labelcliente);
-        
-        
+
         fondo.repaint();
     }
 
@@ -183,35 +184,35 @@ public class client extends JFrame implements Runnable {
         for (int i = 0; i < jugadores.length; i++) {
             fondo.add(jugadores[i].Mano);
             fondo.add(jugadores[i].puntos);
-            
+
         }
-        
+
     }
 //---------------server udp-----------------------------------------
 
     @Override
     public void run() {
         try {
-
             BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
             byte[] receiveData;
             DatagramPacket receivePacket;
             clientSocket = new DatagramSocket(puerto_udp);
             Json x = new Json();
             String modifiedSentence;
+            
+           
+                receiveData = new byte[1024];
+                receivePacket = new DatagramPacket(receiveData, receiveData.length);
+                clientSocket.receive(receivePacket);
+                modifiedSentence = new String(receivePacket.getData()).trim();
+                String ip = "" + receivePacket.getAddress();
+                String[] separar = ip.split("/");
+                host = separar[1];
 
-            receiveData = new byte[1024];
-            receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            clientSocket.receive(receivePacket);
-            modifiedSentence = new String(receivePacket.getData()).trim();
-            String ip = "" + receivePacket.getAddress();
-            String[] separar = ip.split("/");
-            host = separar[1];
-
-            if (modifiedSentence != null) {
-                addserver(x.deco_1(modifiedSentence, 1).toString());
-            }
-
+                if (modifiedSentence != null) {
+                    addserver(x.deco_1(modifiedSentence, 1).toString());
+                }
+            
         } catch (SocketException ex) {
             Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -252,13 +253,15 @@ public class client extends JFrame implements Runnable {
                 out = new DataOutputStream(cliente.getOutputStream());
                 in = new DataInputStream(cliente.getInputStream());
                 System.out.println("Se conecto.");
-                String msgs = paquete.code_2("Cliente-jagg");
+                String msgs = paquete.code_2("Cliente-Javierkelly");
                 out.write(msgs.getBytes());
                 System.out.println("envie " + msgs);
                 in.read(cli);
                 msgs = new String(cli);
+                
                 ID = Integer.parseInt(paquete.deco_3(msgs.trim(), 3).toString());
                 dir_mtc = paquete.deco_3(msgs.trim(), 2).toString();
+                System.out.println(dir_mtc);
                 cli = new byte[1024];
                 new juego_cliente();
 
@@ -272,7 +275,7 @@ public class client extends JFrame implements Runnable {
     public class juego_cliente implements Runnable {
 
         public juego_cliente() {
-            
+
             run();
         }
 
@@ -289,18 +292,20 @@ public class client extends JFrame implements Runnable {
 
                 band = false;
                 socket.joinGroup(InetAddress.getByName(dir_mtc));
+                System.out.println("creado");    
                 //recibir mensaje de presentacion
                 socket.receive(dgram);
                 System.out.println(new String(dgram.getData()));
                 //guardando la cantidad de jugadores que se envio en el paq 4  
                 int cantjug = Integer.parseInt(paquete.deco_4(new String(dgram.getData()).trim(), 0).toString());
                 jugadores = new Jugador[cantjug];
+                System.out.println(new String(dgram.getData()));
                 for (int i = 0; i < jugadores.length; i++) {
                     String aux = paquete.deco_4(new String(dgram.getData()).trim(), i + 1).toString().trim();
                     String[] separar = aux.split(" ");
                     jugadores[i] = new Jugador(separar[0], Integer.parseInt(separar[1]));
-                    jugadores[i].Mano=new JLabel("Mano: "+jugadores[i].getSuma());
-                    jugadores[i].puntos=new JLabel("Puntos: "+jugadores[i].getPuntaje());
+                    jugadores[i].Mano = new JLabel("Mano: " + jugadores[i].getSuma());
+                    jugadores[i].puntos = new JLabel("Puntos: " + jugadores[i].getPuntaje());
                     if (Integer.parseInt(separar[1]) == ID) {
                         iID = i;
                     }
@@ -352,11 +357,11 @@ public class client extends JFrame implements Runnable {
                                 num = num + msg.toString().charAt(1);
                             }
                             for (int i = 0; i < cantjug; i++) {
-                                if (  paquete.getID(msgs.trim())==jugadores[i].getId())  {
+                                if (paquete.getID(msgs.trim()) == jugadores[i].getId()) {
                                     Carta aux = new Carta(x, num);
                                     jugadores[i].addCarta(aux);
                                     colocarcarta(suit, i);
-                                    jugadores[i].Mano.setText("Mano: "+jugadores[i].getSuma());
+                                    jugadores[i].Mano.setText("Mano: " + jugadores[i].getSuma());
                                     fondo.repaint();
                                 } else {
                                 }
@@ -375,6 +380,7 @@ public class client extends JFrame implements Runnable {
                                         if (jugadores[iID].getSuma() < 21) {
                                             System.out.println("oferta aceptada");
                                             msgs = paquete.code_8(true);
+                                            System.out.println(msgs);
                                             out.write(msgs.getBytes());
                                             break;
 
@@ -390,6 +396,11 @@ public class client extends JFrame implements Runnable {
 
                             break;
 
+                        case 10:
+                            System.out.println("estadisticas recibidas");
+                            Object msgss = paquete.deco_10(msgs.trim(), 2);
+                            System.out.println(msgss);
+                            break;
                         default:
                             throw new AssertionError();
                     }

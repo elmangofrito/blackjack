@@ -103,7 +103,7 @@ public class Json {
         paquete.addProperty("codigo", 3);
         paquete.addProperty("aceptado", acpt.toString());
         paquete.addProperty("direccion", dir.toString());
-        paquete.addProperty("id", id.toString());
+        paquete.addProperty("id", Integer.parseInt(id.toString()));
         cadena_JSON = paquete.toString();
         return cadena_JSON;
     }
@@ -139,7 +139,7 @@ public class Json {
         for (int i = 0; i < separar.length / 2; i++) {
             auxjson = new JSONObject();
             auxjson.put("nombre", separar[i * 2]);
-            auxjson.put("id_asignado", separar[(i * 2) + 1]);
+            auxjson.put("id_asignado", Integer.parseInt((separar[(i * 2) + 1]).toString()));
             x.put(auxjson);
         }
         paquete4.put("jugadores", x);
@@ -186,7 +186,7 @@ public class Json {
         for (int i = 0; i < separar.length / 2; i++) {
             auxjson = new JSONObject();
             auxjson.put("puntaje", separar[i * 2]);
-            auxjson.put("id", separar[(i * 2) + 1]);
+            auxjson.put("id", Integer.parseInt(separar[(i * 2) + 1].toString()));
             x.put(auxjson);
         }
         
@@ -249,7 +249,7 @@ public class Json {
     public String code_7(Object id) {
         paquete = new JsonObject();
         paquete.addProperty("codigo", 7);
-        paquete.addProperty("id", id.toString());
+        paquete.addProperty("id", Integer.parseInt(id.toString()));
         cadena_JSON = paquete.toString();
         return cadena_JSON;
     }
@@ -272,7 +272,7 @@ public class Json {
     public String code_8(Object jugar) {
         paquete = new JsonObject();
         paquete.addProperty("codigo", 8);
-        paquete.addProperty("jugar", jugar.toString());
+        paquete.addProperty("jugar", Boolean.parseBoolean(jugar.toString()));
         cadena_JSON = paquete.toString();
         return cadena_JSON;
     }
@@ -294,7 +294,7 @@ public class Json {
     public String code_9(Object ID, Object CARTA) {
         paquete = new JsonObject();
         paquete.addProperty("codigo", 9);
-        paquete.addProperty("id", ID.toString());
+        paquete.addProperty("id", Integer.parseInt(ID.toString()));
         paquete.addProperty("carta", CARTA.toString());
         cadena_JSON = paquete.toString();
         return cadena_JSON;
@@ -337,42 +337,33 @@ public class Json {
     public Object deco_10(String JSON, int opcion) {
         JsonParser parser = new JsonParser();
         JsonElement Objeto = parser.parse(JSON);
+        JsonArray auxx = Objeto.getAsJsonObject().get("puntaje").getAsJsonArray();
+        // una vez que llegue la matriz, puede marcar artículos como 
+
         if (opcion == 0) {
-            return Objeto.getAsJsonObject().get("codigo").getAsInt();
+            return Objeto.getAsJsonObject().get("codigo").getAsString();
         }
-        if (opcion == 1) {
-            return Objeto.getAsJsonObject().get("rondas").getAsInt();
+        switch (opcion) {
+            case 1:
+                return auxx.get(0).getAsJsonObject().get("puntaje").getAsString() + " " + auxx.get(0).getAsJsonObject().get("id").getAsString();
+            case 2:
+                return auxx.get(1).getAsJsonObject().get("puntaje").getAsString() + " " + auxx.get(1).getAsJsonObject().get("id").getAsString();
+            case 3:
+                return auxx.get(2).getAsJsonObject().get("puntaje").getAsString() + " " + auxx.get(2).getAsJsonObject().get("id").getAsString();
+            case 4:
+                return auxx.get(3).getAsJsonObject().get("puntaje").getAsString() + " " + auxx.get(3).getAsJsonObject().get("id").getAsString();
+            case 5:
+                return auxx.get(4).getAsJsonObject().get("puntaje").getAsString() + " " + auxx.get(4).getAsJsonObject().get("id").getAsString();
+                
+            default:
+                return null;
         }
-        if (opcion == 2) {
-            return Objeto.getAsJsonObject().get("cartas_jugadas").getAsInt();
-        }
-        if (opcion == 3) {
-            return Objeto.getAsJsonObject().get("puntaje1").getAsInt();
-        }
-        if (opcion == 4) {
-            return Objeto.getAsJsonObject().get("id1").getAsString();
-        }
-        if (opcion == 5) {
-            return Objeto.getAsJsonObject().get("puntaje2").getAsInt();
-        }
-        if (opcion == 6) {
-            return Objeto.getAsJsonObject().get("id2").getAsString();
-        }
-        if (opcion == 7) {
-            return Objeto.getAsJsonObject().get("puntaje3").getAsInt();
-        }
-        if (opcion == 8) {
-            return Objeto.getAsJsonObject().get("id3").getAsString();
-        }
-        if (opcion == 9) {
-            return Objeto.getAsJsonObject().get("puntaje4").getAsInt();
-        }
-        if (opcion == 10) {
-            return Objeto.getAsJsonObject().get("id4").getAsString();
-        } else {
-            System.err.println("error");
-        }
-        return null;
+
+        
+        
+        
+       
+       
     }
 
     public String code_11(Object ID) {

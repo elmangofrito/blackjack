@@ -99,6 +99,68 @@ public class servidor extends JFrame implements Runnable {
         fondo.repaint();
     }
 
+    public void colocarcarta(String suit, int i) {
+        
+        switch (suit) {
+            case "c":
+                jugadores[i].labelcliente = new JLabel(new ImageIcon(getClass().getResource("/imagens/Corazon/" + jugadores[i].getMano()[jugadores[i].getNumCartas() - 1].getSNumber().toString().trim() + ".png")));
+                break;
+            case "t":
+                jugadores[i].labelcliente = new JLabel(new ImageIcon(getClass().getResource("/imagens/Trebol/" + jugadores[i].getMano()[jugadores[i].getNumCartas() - 1].getSNumber().toString().trim() + ".png")));
+                break;
+            case "d":
+                jugadores[i].labelcliente = new JLabel(new ImageIcon(getClass().getResource("/imagens/Diamante/" + jugadores[i].getMano()[jugadores[i].getNumCartas() - 1].getSNumber().toString().trim() + ".png")));
+                break;
+            case "p":
+                jugadores[i].labelcliente = new JLabel(new ImageIcon(getClass().getResource("/imagens/Pica/" + jugadores[i].getMano()[jugadores[i].getNumCartas() - 1].getSNumber().toString().trim() + ".png")));
+                break;
+
+            default:
+                throw new AssertionError();
+        }
+        switch (i) {
+            case 0:
+                jugadores[i].labelcliente.setLocation(70 - (15 * jugadores[i].getNumCartas()), 300);
+                jugadores[i].Mano.setLocation(70, 400);
+//                jugadores[i].puntos.setLocation(70, 410);
+                break;
+            case 1:
+                jugadores[i].labelcliente.setLocation(250 - (15 * jugadores[i].getNumCartas()), 450);
+                jugadores[i].Mano.setLocation(250  , 550);
+  //              jugadores[i].puntos.setLocation(250, 560);
+                break;
+            case 2:
+                jugadores[i].labelcliente.setLocation(450 - (15 * jugadores[i].getNumCartas()), 450);
+                jugadores[i].Mano.setLocation(450 , 550);
+    //            jugadores[i].puntos.setLocation(450, 560);
+                break;
+            case 3:
+                jugadores[i].labelcliente.setLocation(660 - (15 * jugadores[i].getNumCartas()), 300);
+                jugadores[i].Mano.setLocation(660  , 400);
+      //          jugadores[i].puntos.setLocation(660, 410);
+                break;
+            default:
+                throw new AssertionError();
+        }
+        
+        jugadores[i].labelcliente.setSize(70, 90);
+        jugadores[i].Mano.setSize(60, 15);
+//        jugadores[i].puntos.setSize(60, 15);
+        jugadores[i].Mano.setForeground(Color.WHITE);
+        
+  //      jugadores[i].puntos.setForeground(Color.WHITE);
+        
+        setVisible(true);
+        jugadores[i].Mano.setVisible(true);
+//        jugadores[i].puntos.setVisible(true);
+        fondo.add(jugadores[i].Mano);
+    //    fondo.add(jugadores[i].puntos);
+        fondo.add(jugadores[i].labelcliente);
+        
+        
+        fondo.repaint();
+    }
+    
     public void addcliente(String nombre) {
         JButton cliButton = new JButton();
         cliButton.setSize(400, 100);
@@ -228,7 +290,7 @@ public class servidor extends JFrame implements Runnable {
                 nombre = paquete.deco_2(clientSentence.trim(), 1).toString();
                 System.out.println("recibido: " + nombre);
                 addcliente(nombre);
-                int asigid = (int) Math.floor(Math.random() * (7376284 - 3242343) + 3242343);
+                int asigid = (int) Math.floor(Math.random() * (74 - 32) + 24);
                 jugadores[contClients] = new Jugador(nombre, asigid);
                 jugadores[contClients].cliente = this.cliente;
                 mensaje = paquete.code_3(true, dir_mtc, asigid);
@@ -259,11 +321,13 @@ public class servidor extends JFrame implements Runnable {
                 paquete = new Json();
                 for (int i = 0; i < contClients; i++) {
                     aux = aux + jugadores[i].getNombre() + " " + jugadores[i].getId() + " ";
+                    
                 }
                 //     System.out.println(contClients+"  "+paquete.code_4(aux.trim()));
                 byte[] b = paquete.code_4(aux.trim()).getBytes();
                 //-------------presentacion del juego--------------------------
                 dgram = new DatagramPacket(b, b.length, InetAddress.getByName(dir_mtc), puerto_mtc);
+                System.out.println(paquete.code_4(aux.trim()));
                 socket.send(dgram);
                 //-------------comienzo de ronda---------------------
                 while (true) {
@@ -271,6 +335,7 @@ public class servidor extends JFrame implements Runnable {
                     paquete = new Json();
                     for (int i = 0; i < contClients; i++) {
                         aux = aux + jugadores[i].getPuntaje() + " " + jugadores[i].getId() + " ";
+                        jugadores[i].Mano=new JLabel("Mano: "+jugadores[i].getSuma());
                     }
                     System.out.println(paquete.code_5(aux.trim()));
                     b = paquete.code_5(aux.trim()).getBytes();
@@ -281,6 +346,10 @@ public class servidor extends JFrame implements Runnable {
                         //-----------carta 1---------------------------------
                         cartaaux = mazojuego.sacarCarta();
                         mensaje = cartaaux.getSNumber() + "" + cartaaux.getMySuit();
+                        String suit=cartaaux.getMySuit().toString();
+                        jugadores[i].addCarta(cartaaux);
+                        colocarcarta(suit, i);
+                        jugadores[i].Mano.setText("Mano: "+jugadores[i].getSuma());
                         System.out.println(mensaje);
                         menString = paquete.code_9(jugadores[i].getId(), mensaje.trim());
                         b = menString.getBytes();
