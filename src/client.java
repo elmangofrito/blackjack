@@ -109,22 +109,22 @@ public class client extends JFrame implements Runnable {
            
         switch (i) {
             case 0:
-                jugadores[i].labelcliente.setLocation(70 - (15 * jugadores[iID].getNumCartas()), 300);
+                jugadores[i].labelcliente.setLocation(70 - (15 * jugadores[i].getNumCartas()), 300);
                 jugadores[i].Mano.setLocation(70, 400);
                 jugadores[i].puntos.setLocation(70, 410);
                 break;
             case 1:
-                jugadores[i].labelcliente.setLocation(250 - (15 * jugadores[iID].getNumCartas()), 450);
+                jugadores[i].labelcliente.setLocation(250 - (15 * jugadores[i].getNumCartas()), 450);
                 jugadores[i].Mano.setLocation(250, 550);
                 jugadores[i].puntos.setLocation(250, 560);
                 break;
             case 2:
-                jugadores[i].labelcliente.setLocation(450 - (15 * jugadores[iID].getNumCartas()), 450);
+                jugadores[i].labelcliente.setLocation(450 - (15 * jugadores[i].getNumCartas()), 450);
                 jugadores[i].Mano.setLocation(450, 550);
                 jugadores[i].puntos.setLocation(450, 560);
                 break;
             case 3:
-                jugadores[i].labelcliente.setLocation(660 - (15 * jugadores[iID].getNumCartas()), 300);
+                jugadores[i].labelcliente.setLocation(660 - (15 * jugadores[i].getNumCartas()), 300);
                 jugadores[i].Mano.setLocation(660, 400);
                 jugadores[i].puntos.setLocation(660, 410);
                 break;

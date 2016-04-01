@@ -101,7 +101,7 @@ public class Json {
     public String code_3(Object acpt, Object dir, Object id) {
         paquete = new JsonObject();
         paquete.addProperty("codigo", 3);
-        paquete.addProperty("aceptado", acpt.toString());
+        paquete.addProperty("aceptado",Boolean.parseBoolean( acpt.toString()));
         paquete.addProperty("direccion", dir.toString());
         paquete.addProperty("id", Integer.parseInt(id.toString()));
         cadena_JSON = paquete.toString();
@@ -139,7 +139,8 @@ public class Json {
         for (int i = 0; i < separar.length / 2; i++) {
             auxjson = new JSONObject();
             auxjson.put("nombre", separar[i * 2]);
-            auxjson.put("id_asignado", Integer.parseInt((separar[(i * 2) + 1]).toString()));
+            int s=Integer.parseInt(separar[(i * 2) + 1].toString());
+            auxjson.put("id_asignado", s);
             x.put(auxjson);
         }
         paquete4.put("jugadores", x);
@@ -160,15 +161,15 @@ public class Json {
         }
         switch (opcion) {
             case 1:
-                return auxx.get(0).getAsJsonObject().get("nombre").getAsString() + " " + auxx.get(0).getAsJsonObject().get("id_asignado").getAsString();
+                return auxx.get(0).getAsJsonObject().get("nombre").getAsString().replace(" ", "") + " " + auxx.get(0).getAsJsonObject().get("id_asignado").getAsInt();
             case 2:
-                return auxx.get(1).getAsJsonObject().get("nombre").getAsString() + " " + auxx.get(1).getAsJsonObject().get("id_asignado").getAsString();
+                return auxx.get(1).getAsJsonObject().get("nombre").getAsString().replace(" ", "") + " " + auxx.get(1).getAsJsonObject().get("id_asignado").getAsInt();
             case 3:
-                return auxx.get(2).getAsJsonObject().get("nombre").getAsString() + " " + auxx.get(2).getAsJsonObject().get("id_asignado").getAsString();
+                return auxx.get(2).getAsJsonObject().get("nombre").getAsString().replace(" ", "") + " " + auxx.get(2).getAsJsonObject().get("id_asignado").getAsInt();
             case 4:
-                return auxx.get(3).getAsJsonObject().get("nombre").getAsString() + " " + auxx.get(3).getAsJsonObject().get("id_asignado").getAsString();
+                return auxx.get(3).getAsJsonObject().get("nombre").getAsString().replace(" ", "") + " " + auxx.get(3).getAsJsonObject().get("id_asignado").getAsInt();
             case 5:
-                return auxx.get(4).getAsJsonObject().get("nombre").getAsString() + " " + auxx.get(4).getAsJsonObject().get("id_asignado").getAsString();
+                return auxx.get(4).getAsJsonObject().get("nombre").getAsString().replace(" ", "") + " " + auxx.get(4).getAsJsonObject().get("id_asignado").getAsInt();
             default:
                 return null;
         }
@@ -185,7 +186,7 @@ public class Json {
 
         for (int i = 0; i < separar.length / 2; i++) {
             auxjson = new JSONObject();
-            auxjson.put("puntaje", separar[i * 2]);
+            auxjson.put("puntaje", Integer.parseInt(separar[i * 2]));
             auxjson.put("id", Integer.parseInt(separar[(i * 2) + 1].toString()));
             x.put(auxjson);
         }
@@ -344,7 +345,7 @@ public class Json {
     }
 
     public Object deco_10(String JSON, int opcion) {
-        JsonParser parser = new JsonParser();
+     JsonParser parser = new JsonParser();
         JsonElement Objeto = parser.parse(JSON);
         JsonArray auxx = Objeto.getAsJsonObject().get("puntaje").getAsJsonArray();
         // una vez que llegue la matriz, puede marcar artículos como 
@@ -363,12 +364,10 @@ public class Json {
                 return auxx.get(3).getAsJsonObject().get("puntaje").getAsString() + " " + auxx.get(3).getAsJsonObject().get("id").getAsString();
             case 5:
                 return auxx.get(4).getAsJsonObject().get("puntaje").getAsString() + " " + auxx.get(4).getAsJsonObject().get("id").getAsString();
-                
             default:
                 return null;
         }
 
-        
         
         
        

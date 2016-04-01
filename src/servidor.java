@@ -1,6 +1,8 @@
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -38,7 +40,7 @@ import sun.java2d.pipe.DrawImage;
 public class servidor extends JFrame implements Runnable {
 
     Json paquete;
-    int cont = 10;
+    int cont = 100;
     Socket[] clients = new Socket[4];
     int contClients;
     hilotcp hTCP[];
@@ -78,7 +80,18 @@ public class servidor extends JFrame implements Runnable {
         ImageIcon fot = new ImageIcon((getClass().getResource("/masimagenes/fondo.png")));
         ImageIcon icono = new ImageIcon(fot.getImage().getScaledInstance(fondo.getWidth(), fondo.getHeight(), java.awt.Image.SCALE_DEFAULT));
         fondo.setIcon(icono);
+        JButton iniciar = new JButton("Iniciar");
+        iniciar.setSize(60, 20);
+        iniciar.setLocation(180, 450);
+        iniciar.setVisible(true);
+        fondo.add(iniciar);
+        iniciar.addActionListener(new ActionListener() {
 
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cont=1; //To change body of generated methods, choose Tools | Templates.
+            }
+        });
         hiloUDP = new Thread(this);
         hiloUDP.start();
         controlsocket = new HiloControl();
@@ -212,7 +225,7 @@ public class servidor extends JFrame implements Runnable {
                 byte[] cli = new byte[1024];
                 in.read(cli);
                 clientSentence = new String(cli);
-                nombre = paquete.deco_2(clientSentence.trim(), 1).toString();
+                nombre = paquete.deco_2(clientSentence.trim(), 1).toString().replace(" ", "");
                 System.out.println("recibido: " + nombre);
                 addcliente(nombre);
                 int asigid = (int) Math.floor(Math.random() * (74 - 32) + 24);
@@ -258,10 +271,8 @@ public class servidor extends JFrame implements Runnable {
 
         public void colocarcarta(String suit, int i) {
 
-         
-            jugadores[i].labelcliente = new JLabel(new ImageIcon(getClass().getResource("/imagens/"+suit+"/" + jugadores[i].getMano()[jugadores[i].getNumCartas() - 1].getSNumber().toString().trim() + ".png")));
-                 
-               
+            jugadores[i].labelcliente = new JLabel(new ImageIcon(getClass().getResource("/imagens/" + suit + "/" + jugadores[i].getMano()[jugadores[i].getNumCartas() - 1].getSNumber().toString().trim() + ".png")));
+
             switch (i) {
                 case 0:
                     jugadores[i].labelcliente.setLocation(70 - (15 * jugadores[i].getNumCartas()), 300);
@@ -328,8 +339,8 @@ public class servidor extends JFrame implements Runnable {
                 socket.send(dgram);
                 //-------------comienzo de ronda---------------------
                 while (true) {
-                    Thread.sleep(1000);
-                    
+                    Thread.sleep(2000);
+
                     aux = "";
                     paquete = new Json();
                     for (int i = 0; i < contClients; i++) {
@@ -342,7 +353,7 @@ public class servidor extends JFrame implements Runnable {
                     dgram = new DatagramPacket(b, b.length, InetAddress.getByName(dir_mtc), puerto_mtc);
                     socket.send(dgram);
                     Carta cartaaux;
-                    for (int i = 0; i < contClients - 1; i++) {
+                    for (int i = 0; i < contClients; i++) {
                         //-----------carta 1---------------------------------
                         cartaaux = mazojuego.sacarCarta();
                         mensaje = cartaaux.getSNumber() + "" + cartaaux.getMySuit();
@@ -357,15 +368,14 @@ public class servidor extends JFrame implements Runnable {
                         socket.send(dgram);
                     }
 
-                    for (int i = 0; i < contClients - 1; i++) {
-                        DataOutputStream outToClient = new DataOutputStream(jugadores[i].cliente.getOutputStream());
-                        DataInputStream in = new DataInputStream(jugadores[i].cliente.getInputStream());
+                    for (int i = 0; i < contClients; i++) {
+
                         //-----------carta 2---------------------------------
                         cartaaux = mazojuego.sacarCarta();
                         mensaje = cartaaux.getSNumber() + "" + cartaaux.getMySuit();
                         String suit = cartaaux.getMySuit().toString();
                         jugadores[i].addCarta(cartaaux);
-                        colocarcarta(suit, i);    
+                        colocarcarta(suit, i);
                         menString = paquete.code_9(jugadores[i].getId(), mensaje.trim());
                         b = menString.getBytes();
                         dgram = new DatagramPacket(b, b.length, InetAddress.getByName(dir_mtc), puerto_mtc);
@@ -381,12 +391,17 @@ public class servidor extends JFrame implements Runnable {
                         boolean band = false;
                         do {
                             menString = paquete.code_7(jugadores[i].getId());
-                            outToClient.write(mensaje.getBytes());
+                            System.out.println("oferta");
+                            outToClient.write(menString.getBytes());
+                            System.out.println("oferta-enviada");
                             b = new byte[2014];
                             in.read(b);
                             mensaje = null;
                             mensaje = new String(b);
-                            band = (boolean) (paquete.deco_8(mensaje.trim(), 1));
+                            System.out.println(mensaje);
+                            if (paquete.getCode(mensaje.trim()) == 8) {
+                                band = (boolean) (paquete.deco_8(mensaje.trim(), 1));
+                            }
                             if (band) {
                                 System.out.println("oferta enviada a " + jugadores[i].getId());
                                 System.out.println("oferta aceptada");
