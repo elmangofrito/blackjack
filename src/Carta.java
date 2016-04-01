@@ -1,3 +1,6 @@
+
+import javax.swing.JLabel;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -14,7 +17,7 @@ public class Carta
     private Suit mySuit; // El palo de la carta
     private String myNumber; // El numero de la carta: As = 1, J-K = 11-13
     private String[] Mynumber={"a","2","3","4","5","6","7","8","9","10","j","q","k"};
-
+    JLabel cart;
     public String getMynumber(int n) {
         return this.Mynumber[n];
     }

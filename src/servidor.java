@@ -57,6 +57,7 @@ public class servidor extends JFrame implements Runnable {
     String dir_bro = "255.255.255.255";
     String mensaje, menString;
     JLabel fondo;
+    int nrondas = 0;
 
     public servidor(JFrame x) {
 //-----------------jframe------------------------
@@ -74,7 +75,7 @@ public class servidor extends JFrame implements Runnable {
         fondo.setSize(getSize());
         fondo.setVisible(true);
         add(fondo);
-        ImageIcon fot = new ImageIcon((getClass().getResource("/masimagenes/fondo.jpg")));
+        ImageIcon fot = new ImageIcon((getClass().getResource("/masimagenes/fondo.png")));
         ImageIcon icono = new ImageIcon(fot.getImage().getScaledInstance(fondo.getWidth(), fondo.getHeight(), java.awt.Image.SCALE_DEFAULT));
         fondo.setIcon(icono);
 
@@ -85,82 +86,6 @@ public class servidor extends JFrame implements Runnable {
         hiloTCP.start();
     }
 
-    public void comenzarjuego() {
-        fondo.removeAll();
-        super.remove(fondo);
-        setSize(800, 600);
-        fondo.setLocation(0, 0);
-        fondo.setSize(getSize());
-        fondo.setVisible(true);
-        add(fondo);
-        ImageIcon fot = new ImageIcon((getClass().getResource("/masimagenes/fondo.jpg")));
-        ImageIcon icono = new ImageIcon(fot.getImage().getScaledInstance(fondo.getWidth(), fondo.getHeight(), java.awt.Image.SCALE_DEFAULT));
-        fondo.setIcon(icono);
-        fondo.repaint();
-    }
-
-    public void colocarcarta(String suit, int i) {
-        
-        switch (suit) {
-            case "c":
-                jugadores[i].labelcliente = new JLabel(new ImageIcon(getClass().getResource("/imagens/Corazon/" + jugadores[i].getMano()[jugadores[i].getNumCartas() - 1].getSNumber().toString().trim() + ".png")));
-                break;
-            case "t":
-                jugadores[i].labelcliente = new JLabel(new ImageIcon(getClass().getResource("/imagens/Trebol/" + jugadores[i].getMano()[jugadores[i].getNumCartas() - 1].getSNumber().toString().trim() + ".png")));
-                break;
-            case "d":
-                jugadores[i].labelcliente = new JLabel(new ImageIcon(getClass().getResource("/imagens/Diamante/" + jugadores[i].getMano()[jugadores[i].getNumCartas() - 1].getSNumber().toString().trim() + ".png")));
-                break;
-            case "p":
-                jugadores[i].labelcliente = new JLabel(new ImageIcon(getClass().getResource("/imagens/Pica/" + jugadores[i].getMano()[jugadores[i].getNumCartas() - 1].getSNumber().toString().trim() + ".png")));
-                break;
-
-            default:
-                throw new AssertionError();
-        }
-        switch (i) {
-            case 0:
-                jugadores[i].labelcliente.setLocation(70 - (15 * jugadores[i].getNumCartas()), 300);
-                jugadores[i].Mano.setLocation(70, 400);
-//                jugadores[i].puntos.setLocation(70, 410);
-                break;
-            case 1:
-                jugadores[i].labelcliente.setLocation(250 - (15 * jugadores[i].getNumCartas()), 450);
-                jugadores[i].Mano.setLocation(250  , 550);
-  //              jugadores[i].puntos.setLocation(250, 560);
-                break;
-            case 2:
-                jugadores[i].labelcliente.setLocation(450 - (15 * jugadores[i].getNumCartas()), 450);
-                jugadores[i].Mano.setLocation(450 , 550);
-    //            jugadores[i].puntos.setLocation(450, 560);
-                break;
-            case 3:
-                jugadores[i].labelcliente.setLocation(660 - (15 * jugadores[i].getNumCartas()), 300);
-                jugadores[i].Mano.setLocation(660  , 400);
-      //          jugadores[i].puntos.setLocation(660, 410);
-                break;
-            default:
-                throw new AssertionError();
-        }
-        
-        jugadores[i].labelcliente.setSize(70, 90);
-        jugadores[i].Mano.setSize(60, 15);
-//        jugadores[i].puntos.setSize(60, 15);
-        jugadores[i].Mano.setForeground(Color.WHITE);
-        
-  //      jugadores[i].puntos.setForeground(Color.WHITE);
-        
-        setVisible(true);
-        jugadores[i].Mano.setVisible(true);
-//        jugadores[i].puntos.setVisible(true);
-        fondo.add(jugadores[i].Mano);
-    //    fondo.add(jugadores[i].puntos);
-        fondo.add(jugadores[i].labelcliente);
-        
-        
-        fondo.repaint();
-    }
-    
     public void addcliente(String nombre) {
         JButton cliButton = new JButton();
         cliButton.setSize(400, 100);
@@ -294,7 +219,6 @@ public class servidor extends JFrame implements Runnable {
                 jugadores[contClients] = new Jugador(nombre, asigid);
                 jugadores[contClients].cliente = this.cliente;
                 mensaje = paquete.code_3(true, dir_mtc, asigid);
-                //       System.out.println(mensaje);
                 outToClient.write(mensaje.getBytes());
 
             } catch (IOException ex) {
@@ -306,6 +230,79 @@ public class servidor extends JFrame implements Runnable {
 //---------------------multicast y juego--------------------------------
 
     public class Juego implements Runnable {
+
+        public void comenzarjuego() {
+            fondo.removeAll();
+            remove(fondo);
+            setSize(800, 600);
+            fondo.setLocation(0, 0);
+            fondo.setSize(getSize());
+            fondo.setVisible(true);
+            add(fondo);
+            ImageIcon fot = new ImageIcon((getClass().getResource("/masimagenes/fondo.png")));
+            ImageIcon icono = new ImageIcon(fot.getImage().getScaledInstance(fondo.getWidth(), fondo.getHeight(), java.awt.Image.SCALE_DEFAULT));
+            fondo.setIcon(icono);
+            fondo.repaint();
+        }
+
+        public void limpiarjuego() {
+            setSize(800, 600);
+            fondo.removeAll();
+            for (int i = 0; i < contClients; i++) {
+                fondo.add(jugadores[i].Mano);
+                fondo.add(jugadores[i].puntos);
+
+            }
+
+        }
+
+        public void colocarcarta(String suit, int i) {
+
+         
+            jugadores[i].labelcliente = new JLabel(new ImageIcon(getClass().getResource("/imagens/"+suit+"/" + jugadores[i].getMano()[jugadores[i].getNumCartas() - 1].getSNumber().toString().trim() + ".png")));
+                 
+               
+            switch (i) {
+                case 0:
+                    jugadores[i].labelcliente.setLocation(70 - (15 * jugadores[i].getNumCartas()), 300);
+                    jugadores[i].Mano.setLocation(70, 400);
+                    jugadores[i].puntos.setLocation(70, 410);
+                    break;
+                case 1:
+                    jugadores[i].labelcliente.setLocation(250 - (15 * jugadores[i].getNumCartas()), 450);
+                    jugadores[i].Mano.setLocation(250, 550);
+                    jugadores[i].puntos.setLocation(250, 560);
+                    break;
+                case 2:
+                    jugadores[i].labelcliente.setLocation(450 - (15 * jugadores[i].getNumCartas()), 450);
+                    jugadores[i].Mano.setLocation(450, 550);
+                    jugadores[i].puntos.setLocation(450, 560);
+                    break;
+                case 3:
+                    jugadores[i].labelcliente.setLocation(660 - (15 * jugadores[i].getNumCartas()), 300);
+                    jugadores[i].Mano.setLocation(660, 400);
+                    jugadores[i].puntos.setLocation(660, 410);
+                    break;
+                default:
+                    throw new AssertionError();
+            }
+
+            jugadores[i].labelcliente.setSize(70, 90);
+            jugadores[i].Mano.setSize(60, 15);
+            jugadores[i].puntos.setSize(60, 15);
+            jugadores[i].Mano.setForeground(Color.WHITE);
+
+            jugadores[i].puntos.setForeground(Color.WHITE);
+
+            setVisible(true);
+            jugadores[i].Mano.setVisible(true);
+            jugadores[i].puntos.setVisible(true);
+            fondo.add(jugadores[i].Mano);
+            fondo.add(jugadores[i].puntos);
+            fondo.add(jugadores[i].labelcliente);
+
+            fondo.repaint();
+        }
 
         public Juego() {
             comenzarjuego();
@@ -321,7 +318,7 @@ public class servidor extends JFrame implements Runnable {
                 paquete = new Json();
                 for (int i = 0; i < contClients; i++) {
                     aux = aux + jugadores[i].getNombre() + " " + jugadores[i].getId() + " ";
-                    
+                    jugadores[i].puntos = new JLabel("Puntos: " + jugadores[i].getPuntaje());
                 }
                 //     System.out.println(contClients+"  "+paquete.code_4(aux.trim()));
                 byte[] b = paquete.code_4(aux.trim()).getBytes();
@@ -331,11 +328,14 @@ public class servidor extends JFrame implements Runnable {
                 socket.send(dgram);
                 //-------------comienzo de ronda---------------------
                 while (true) {
+                    Thread.sleep(1000);
+                    
                     aux = "";
                     paquete = new Json();
                     for (int i = 0; i < contClients; i++) {
                         aux = aux + jugadores[i].getPuntaje() + " " + jugadores[i].getId() + " ";
-                        jugadores[i].Mano=new JLabel("Mano: "+jugadores[i].getSuma());
+                        jugadores[i].Mano = new JLabel("Mano: " + jugadores[i].getSuma());
+                        jugadores[i].puntos.setText("Puntos: " + jugadores[i].getPuntaje());
                     }
                     System.out.println(paquete.code_5(aux.trim()));
                     b = paquete.code_5(aux.trim()).getBytes();
@@ -346,10 +346,10 @@ public class servidor extends JFrame implements Runnable {
                         //-----------carta 1---------------------------------
                         cartaaux = mazojuego.sacarCarta();
                         mensaje = cartaaux.getSNumber() + "" + cartaaux.getMySuit();
-                        String suit=cartaaux.getMySuit().toString();
+                        String suit = cartaaux.getMySuit().toString();
                         jugadores[i].addCarta(cartaaux);
                         colocarcarta(suit, i);
-                        jugadores[i].Mano.setText("Mano: "+jugadores[i].getSuma());
+                        jugadores[i].Mano.setText("Mano: " + jugadores[i].getSuma());
                         System.out.println(mensaje);
                         menString = paquete.code_9(jugadores[i].getId(), mensaje.trim());
                         b = menString.getBytes();
@@ -363,8 +363,9 @@ public class servidor extends JFrame implements Runnable {
                         //-----------carta 2---------------------------------
                         cartaaux = mazojuego.sacarCarta();
                         mensaje = cartaaux.getSNumber() + "" + cartaaux.getMySuit();
-                        System.out.println(mensaje);
-
+                        String suit = cartaaux.getMySuit().toString();
+                        jugadores[i].addCarta(cartaaux);
+                        colocarcarta(suit, i);    
                         menString = paquete.code_9(jugadores[i].getId(), mensaje.trim());
                         b = menString.getBytes();
                         dgram = new DatagramPacket(b, b.length, InetAddress.getByName(dir_mtc), puerto_mtc);
@@ -393,6 +394,9 @@ public class servidor extends JFrame implements Runnable {
                                 mensaje = cartaaux.getSNumber() + "" + cartaaux.getMySuit();
                                 System.out.println(mensaje);
                                 menString = paquete.code_9(jugadores[i].getId(), mensaje.trim());
+                                String suit = cartaaux.getMySuit().toString();
+                                jugadores[i].addCarta(cartaaux);
+                                colocarcarta(suit, i);
                                 b = menString.getBytes();
                                 dgram = new DatagramPacket(b, b.length, InetAddress.getByName(dir_mtc), puerto_mtc);
                                 socket.send(dgram);
@@ -404,9 +408,18 @@ public class servidor extends JFrame implements Runnable {
 
                     }
                     System.out.println("fin de ofertas");
+                    limpiarjuego();
+                    for (int i = 0; i < contClients; i++) {
+                        jugadores[i].vaciarMano();
+                    }
+
+                    nrondas++;
+                    System.out.println("numero de ronda " + nrondas);
                 }
 
             } catch (IOException ex) {
+                Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
                 Logger.getLogger(servidor.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
